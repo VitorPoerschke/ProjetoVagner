@@ -1,57 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <title>Sistema de Tarefas</title>
+  <meta charset="UTF-8">
+  <title>Projeto Wagner - API de Tarefas</title>
 </head>
 <body>
-  <h1>Login</h1>
-  <input id="email" placeholder="Email" />
-  <input id="senha" placeholder="Senha" type="password" />
-  <button onclick="logar()">Entrar</button>
-
-  <div id="app" style="display:none">
-    <h2>Criar Tarefa</h2>
-    <input id="titulo" placeholder="Título" />
-    <input id="descricao" placeholder="Descrição" />
-    <button onclick="criarTarefa()">Criar</button>
-
-    <h2>Listar Tarefas</h2>
-    <ul id="lista"></ul>
-  </div>
-
-  <script>
-    let token = '';
-    async function logar() {
-      const email = document.getElementById('email').value;
-      const senha = document.getElementById('senha').value;
-      const res = await fetch('http://localhost:3000/login', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ email, senha })
-      });
-      const data = await res.json();
-      token = data.token;
-      document.getElementById('app').style.display = 'block';
-      listarTarefas();
-    }
-
-    async function criarTarefa() {
-      const titulo = document.getElementById('titulo').value;
-      const descricao = document.getElementById('descricao').value;
-      await fetch('http://localhost:3000/tarefas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ titulo, descricao })
-      });
-      listarTarefas();
-    }
-
-    async function listarTarefas() {
-      const res = await fetch('http://localhost:3000/tarefas', {
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
-      const tarefas = await res.json();
-      document.getElementById('lista').innerHTML = tarefas.map(t => `<li>${t.titulo} - ${t.status}</li>`).join('');
-    }
-  </script>
+  <h1>Servidor Backend Rodando</h1>
+  <p>API de Tarefas com Login JWT funcionando!</p>
 </body>
 </html>

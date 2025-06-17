@@ -5,23 +5,22 @@ const path = require('path');
 
 const app = express();
 
-// Middlewares básicos
 app.use(cors());
 app.use(express.json());
 
-// Importando as Rotas
+// Importando Rotas
 const authRoutes = require('./routes/auth');
 const tarefaRoutes = require('./routes/tarefas');
-const usuarioRoutes = require('./routes/usuarios');
+const usuarioRoutes = require('./routes/usuarios');  // Agora vai funcionar pois existe!
 
-// Usando as rotas com prefixo /api
+// Usando as rotas
 app.use('/api/auth', authRoutes);
 app.use('/api/tarefas', tarefaRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 
-// Servindo arquivos estáticos (ex: index.html dentro da pasta public)
+// Servir frontend (index.html na pasta public)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Porta de execução
+// Porta
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));

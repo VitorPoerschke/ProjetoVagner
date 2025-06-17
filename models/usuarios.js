@@ -9,7 +9,7 @@ const usuarios = [
     senha: bcrypt.hashSync('123456', 8), // Senha já criptografada
     role: 'master', // Pode ser: master, cliente, gerenciador, advogado
   },
-  // Depois vamos permitir cadastro de outros usuários
 ];
 
 module.exports = usuarios;
+// Exporta a lista de usuários para ser usada nas rotas

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
 
-// Rota de Login
 router.post('/login', authController.login);
 
 module.exports = router;
+// Exporta as rotas de autenticação para serem usadas no index.js

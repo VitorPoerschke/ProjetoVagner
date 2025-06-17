@@ -13,9 +13,10 @@ function autenticarToken(req, res, next) {
       return res.status(403).json({ erro: 'Token inválido' });
     }
 
-    req.user = usuario; // Adiciona os dados do usuário à requisição
-    next(); // Continua para a próxima função
+    req.user = usuario;
+    next();
   });
 }
 
 module.exports = autenticarToken;
+// Exporta o middleware de autenticação para ser usado nas rotas

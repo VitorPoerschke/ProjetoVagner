@@ -19,4 +19,3 @@ function autenticarToken(req, res, next) {
 }
 
 module.exports = autenticarToken;
-// Exporta o middleware de autenticação para ser usado nas rotas

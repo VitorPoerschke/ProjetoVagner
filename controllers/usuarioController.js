@@ -1,6 +1,5 @@
-const bcrypt = require('bcryptjs');
 const usuarios = require('../models/usuarios');
-
+const bcrypt = require('bcryptjs');
 
 // Listar todos os usuários
 exports.listarUsuarios = (req, res) => {
@@ -11,13 +10,19 @@ exports.listarUsuarios = (req, res) => {
 exports.buscarUsuarioPorId = (req, res) => {
   const id = parseInt(req.params.id);
   const usuario = usuarios.find(u => u.id === id);
-  if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
+  if (!usuario) {
+    return res.status(404).json({ erro: 'Usuário não encontrado' });
+  }
   res.json(usuario);
 };
 
 // Criar novo usuário
 exports.criarUsuario = (req, res) => {
   const { nome, email, senha, role } = req.body;
+  if (!nome || !email || !senha || !role) {
+    return res.status(400).json({ erro: 'Todos os campos são obrigatórios' });
+  }
+
   const novoUsuario = {
     id: usuarios.length + 1,
     nome,
@@ -33,7 +38,9 @@ exports.criarUsuario = (req, res) => {
 exports.atualizarUsuario = (req, res) => {
   const id = parseInt(req.params.id);
   const usuario = usuarios.find(u => u.id === id);
-  if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
+  if (!usuario) {
+    return res.status(404).json({ erro: 'Usuário não encontrado' });
+  }
 
   const { nome, email, senha, role } = req.body;
   if (nome) usuario.nome = nome;
@@ -48,8 +55,9 @@ exports.atualizarUsuario = (req, res) => {
 exports.deletarUsuario = (req, res) => {
   const id = parseInt(req.params.id);
   const index = usuarios.findIndex(u => u.id === id);
-  if (index === -1) return res.status(404).json({ erro: 'Usuário não encontrado' });
-
+  if (index === -1) {
+    return res.status(404).json({ erro: 'Usuário não encontrado' });
+  }
   usuarios.splice(index, 1);
   res.json({ mensagem: 'Usuário deletado com sucesso' });
 };

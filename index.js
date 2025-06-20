@@ -8,17 +8,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Importando Rotas
+// Importar Rotas
 const authRoutes = require('./routes/auth');
 const tarefaRoutes = require('./routes/tarefas');
-const usuarioRoutes = require('./routes/usuarios');  // Agora vai funcionar pois existe!
+const usuarioRoutes = require('./routes/usuarios');
 
-// Usando as rotas
+// Usar Rotas
 app.use('/api/auth', authRoutes);
 app.use('/api/tarefas', tarefaRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 
-// Servir frontend (index.html na pasta public)
+// Servir o frontend (public/index.html)
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Porta

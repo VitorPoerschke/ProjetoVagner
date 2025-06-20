@@ -1,0 +1,31 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.tarefa {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.master {
+    color: green;
+}
+
+.cliente {
+    color: blue;
+}
+
+nav button {
+    margin: 5px;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+nav button:hover {
+    background-color: #f0f0f0;
+}

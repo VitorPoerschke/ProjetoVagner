@@ -1,68 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Painel</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <title>Painel</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <h2 id="userRole">Você está logado como:</h2>
 
-    <h2 id="userRole">Você está logado como: </h2>
+  <button onclick="window.location.href='criarTarefa.html'">Criar Tarefa</button>
+  <button onclick="window.location.href='listarTarefas.html'">Ver Minhas Tarefas</button>
+  <button onclick="window.location.href='atribuirResponsavel.html'">Atribuir Responsável</button>
+  <button onclick="window.location.href='alterarStatus.html'">Alterar Status</button>
+  <button onclick="window.location.href='verHistorico.html'">Ver Histórico</button>
+  <button onclick="logout()">Sair</button>
 
-    <nav>
-        <button onclick="window.location.href='criarUsuario.html'">Criar Novo Usuário</button>
-        <button onclick="window.location.href='criarTarefa.html'">Criar Nova Tarefa</button>
-        <button onclick="mostrarTarefas()">Ver Tarefas</button>
-        <button onclick="logout()">Sair</button>
-    </nav>
+  <script>
+    const token = localStorage.getItem('token');
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    document.getElementById('userRole').innerText += ' ' + payload.role;
 
-    <h3>Lista de Tarefas:</h3>
-    <div id="tarefasContainer"></div>
-
-    <script src="js/app.js"></script>
-    <script>
-        // Exibe o tipo de usuário ao carregar a página
-        document.addEventListener('DOMContentLoaded', () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                alert('Você não está logado!');
-                window.location.href = 'index.html';
-                return;
-            }
-
-            const payloadBase64 = token.split('.')[1];
-            const payload = JSON.parse(atob(payloadBase64));
-
-            const roleText = payload.role === 'master' ? 'MASTER (Administrador)' : 'CLIENTE (Usuário Comum)';
-            const roleClass = payload.role === 'master' ? 'master' : 'cliente';
-
-            const roleElement = document.getElementById('userRole');
-            roleElement.textContent = `Você está logado como: ${roleText}`;
-            roleElement.classList.add(roleClass);
-        });
-
-        function logout() {
-            localStorage.removeItem('token');
-            window.location.href = 'index.html';
-        }
-
-        async function mostrarTarefas() {
-            const res = await fetch('/api/tarefas', {
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-            });
-
-            const tarefas = await res.json();
-            const container = document.getElementById('tarefasContainer');
-            container.innerHTML = '';
-
-            tarefas.forEach(tarefa => {
-                const div = document.createElement('div');
-                div.classList.add('tarefa');
-                div.textContent = `${tarefa.titulo} - ${tarefa.status}`;
-                container.appendChild(div);
-            });
-        }
-    </script>
-
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    }
+  </script>
 </body>
 </html>

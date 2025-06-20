@@ -1,31 +1,119 @@
 body {
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6f8;
+    color: #333;
+}
+
+header {
+    background-color: #007BFF;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+    max-width: 900px;
+    margin: 30px auto;
     padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2, h3 {
+    color: #007BFF;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin: 5px 0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 .tarefa {
     border: 1px solid #ccc;
-    padding: 10px;
+    padding: 15px;
     margin-bottom: 10px;
     border-radius: 5px;
+    background-color: #f9f9f9;
 }
 
-.master {
+.tarefa.master {
+    border-left: 5px solid green;
+}
+
+.tarefa.cliente {
+    border-left: 5px solid blue;
+}
+
+.tarefa.advogado {
+    border-left: 5px solid orange;
+}
+
+.success {
     color: green;
+    font-weight: bold;
 }
 
-.cliente {
-    color: blue;
+.error {
+    color: red;
+    font-weight: bold;
 }
 
-nav button {
-    margin: 5px;
+#userRole {
+    margin-bottom: 20px;
     padding: 10px;
+    background-color: #e9ecef;
     border-radius: 5px;
-    border: none;
-    cursor: pointer;
 }
 
-nav button:hover {
-    background-color: #f0f0f0;
+a.button-link {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 10px;
+    text-decoration: none;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 5px;
+}
+
+a.button-link:hover {
+    background-color: #0056b3;
+}
+
+nav {
+    margin-bottom: 20px;
+}
+
+nav a {
+    margin-right: 10px;
+    text-decoration: none;
+    color: #007BFF;
+}
+
+nav a:hover {
+    text-decoration: underline;
 }

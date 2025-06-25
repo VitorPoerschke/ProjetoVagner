@@ -2,12 +2,84 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Minhas Tarefas</title>
+  <title>Todas as Tarefas</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f3f3f3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .painel {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 800px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    button {
+      margin-top: 20px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      background-color: #333;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #555;
+    }
+  </style>
 </head>
 <body>
-  <h2>Minhas Tarefas</h2>
-  <ul id="listaTarefas"></ul>
-  <button onclick="window.location.href='painel.html'">Voltar</button>
+  <div class="painel">
+    <h2>Tarefas Recebidas</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Status</th>
+          <th>Criador</th>
+          <th>Responsável</th>
+        </tr>
+      </thead>
+      <tbody id="corpoTarefas">
+        <!-- Tarefas virão aqui via JS -->
+      </tbody>
+    </table>
+
+    <button onclick="window.location.href='painel.html'">Voltar</button>
+  </div>
 
   <script src="js/listarTarefas.js"></script>
 </body>

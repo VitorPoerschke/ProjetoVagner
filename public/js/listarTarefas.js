@@ -1,19 +1,44 @@
 const token = localStorage.getItem('token');
 
 async function listarTarefas() {
-  const res = await fetch('/api/tarefas', {
-    headers: { 'Authorization': 'Bearer ' + token }
-  });
+  try {
+    const res = await fetch('/api/tarefas', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
 
-  const tarefas = await res.json();
-  const lista = document.getElementById('listaTarefas');
-  lista.innerHTML = '';
+    if (!res.ok) {
+      throw new Error('Falha ao buscar tarefas');
+    }
 
-  tarefas.forEach(t => {
-    const li = document.createElement('li');
-    li.textContent = `${t.titulo} - ${t.status}`;
-    lista.appendChild(li);
-  });
+    const tarefas = await res.json();
+    const corpoTabela = document.getElementById('corpoTarefas');
+    corpoTabela.innerHTML = '';
+
+    if (tarefas.length === 0) {
+      const linha = document.createElement('tr');
+      linha.innerHTML = '<td colspan="5">Nenhuma tarefa encontrada.</td>';
+      corpoTabela.appendChild(linha);
+      return;
+    }
+
+    tarefas.forEach(t => {
+      const linha = document.createElement('tr');
+      linha.innerHTML = `
+        <td>${t.id}</td>
+        <td>${t.titulo}</td>
+        <td>${t.status}</td>
+        <td>${t.nomeCriador || 'Desconhecido'}</td>
+        <td>${t.responsavel || '-'}</td>
+      `;
+      corpoTabela.appendChild(linha);
+    });
+  } catch (erro) {
+    console.error('Erro ao listar tarefas:', erro);
+    alert('Erro ao carregar tarefas.');
+  }
 }
 
-listarTarefas();
+document.addEventListener('DOMContentLoaded', listarTarefas);
+

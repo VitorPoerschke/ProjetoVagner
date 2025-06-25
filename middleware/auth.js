@@ -13,9 +13,17 @@ function autenticarToken(req, res, next) {
       return res.status(403).json({ erro: 'Token inválido' });
     }
 
-    req.user = usuario;
+    // Aqui garantimos que vai ter os campos padrão
+    req.user = {
+      id: usuario.id,
+      nome: usuario.nome,
+      email: usuario.email,
+      role: usuario.role
+    };
+
     next();
   });
 }
 
 module.exports = autenticarToken;
+// Exporta a função de autenticação para ser usada em outras partes do app

@@ -8,18 +8,21 @@ exports.login = (req, res) => {
   // Procura o usuário pelo email
   const usuario = usuarios.find(u => u.email === email);
 
-  // Se usuário não existir ou a senha estiver errada
   if (!usuario || !bcrypt.compareSync(senha, usuario.senha)) {
     return res.status(403).json({ erro: 'Credenciais inválidas' });
   }
 
-  // Gera o token JWT
+  // Gera o token JWT com todos os dados relevantes
   const token = jwt.sign(
-    { id: usuario.id, role: usuario.role },
+    {
+      id: usuario.id,
+      nome: usuario.nome,
+      email: usuario.email,
+      role: usuario.role
+    },
     process.env.JWT_SECRET,
-    { expiresIn: '1h' } // Opcional: token expira em 1 hora
+    { expiresIn: '1h' }
   );
 
-  // Retorna o token para o cliente (front-end)
   res.json({ token });
 };

@@ -1,9 +1,35 @@
 const tarefas = require('../models/tarefas');
 
-// Listar todas
+
+const usuarios = require('../models/usuarios');
+
 exports.listarTarefas = (req, res) => {
-    res.json(tarefas);
+  try {
+    if (req.user.role === 'master') {
+      const tarefasComNomes = tarefas.map(t => {
+        const usuario = usuarios.find(u => u.id === t.usuarioId);
+        return {
+          ...t,
+          nomeCriador: usuario ? usuario.nome : 'Desconhecido'
+        };
+      });
+
+      return res.json(tarefasComNomes);
+    }
+
+    // Cliente: retorna só suas tarefas e define "Você" como nomeCriador
+const tarefasDoUsuario = tarefas
+  .filter(t => t.usuarioId === req.user.id)
+  .map(t => ({ ...t, nomeCriador: 'Você' }));
+
+return res.json(tarefasDoUsuario);
+
+  } catch (err) {
+    console.error('Erro no listarTarefas:', err.message);
+    return res.status(500).json({ erro: 'Erro interno ao listar tarefas' });
+  }
 };
+
 
 // Buscar por ID
 exports.buscarTarefaPorId = (req, res) => {
@@ -24,7 +50,7 @@ exports.criarTarefa = (req, res) => {
         descricao,
         status: 'pendente',
         responsavel: '',
-        usuarioId: req.usuario.id
+        usuarioId: req.user.id
     };
 
     tarefas.push(novaTarefa);
@@ -83,5 +109,13 @@ exports.atualizarStatus = (req, res) => {
 // Histórico (listar concluídas)
 exports.historicoConcluidas = (req, res) => {
     const concluidas = tarefas.filter(t => t.status === 'concluido');
-    res.json(concluidas);
+
+    if (req.user.tipo === 'Master') {
+        // Master vê todas as concluídas
+        res.json(concluidas);
+    } else {
+        // Cliente vê só as que ele criou
+        const minhas = concluidas.filter(t => t.usuarioId === req.user.id);
+        res.json(minhas);
+    }
 };

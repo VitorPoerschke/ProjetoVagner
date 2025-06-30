@@ -2,67 +2,140 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Todas as Tarefas</title>
+  <title>Tarefas Recebidas</title>
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f3f3f3;
+    }
+
+    body {
       display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1e1e2f;
+      color: #fff;
       height: 100vh;
     }
 
-    .painel {
-      background-color: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      width: 90%;
-      max-width: 800px;
+    .sidebar {
+      width: 200px;
+      background-color: #15151e;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar h1 {
+      font-size: 20px;
+      margin-bottom: 40px;
+      color: #facc15;
+      text-align: center;
+    }
+
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .menu a {
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .menu a:hover {
+      background-color: #2e2e3e;
+    }
+
+    .logout {
+      background-color: #2d2d40;
+      padding: 10px;
+      text-align: center;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .logout:hover {
+      background-color: #3b3b55;
+    }
+
+    .main {
+      flex: 1;
+      padding: 40px;
+      background-color: #262636;
+      overflow-y: auto;
+    }
+
+    .main h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #fefefe;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      background-color: #fff;
+      color: #111;
+      border-radius: 8px;
+      overflow: hidden;
     }
 
     th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
+      padding: 12px 10px;
       text-align: center;
+      border-bottom: 1px solid #ccc;
     }
 
-    h2 {
-      text-align: center;
+    th {
+      background-color: #f4f4f4;
+      font-weight: bold;
     }
 
-    button {
-      margin-top: 20px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 10px 20px;
-      font-size: 16px;
+    tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+
+    .btn-voltar {
+      margin-top: 25px;
+      background-color: #4f46e5;
       border: none;
-      background-color: #333;
       color: white;
-      border-radius: 5px;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
       cursor: pointer;
+      display: inline-block;
     }
 
-    button:hover {
-      background-color: #555;
+    .btn-voltar:hover {
+      background-color: #4338ca;
     }
   </style>
 </head>
 <body>
-  <div class="painel">
-    <h2>Tarefas Recebidas</h2>
+  <div class="sidebar">
+    <div>
+      <h1>⚖️</h1>
+      <div class="menu">
+        <a href="painel.html">Painel</a>
+        <a href="listarTarefas.html">Tarefas</a>
+        <a href="#">Clientes</a>
+      </div>
+    </div>
+    <div class="logout" onclick="logout()">Sair</div>
+  </div>
 
+  <div class="main">
+    <h2>Tarefas Recebidas</h2>
     <table>
       <thead>
         <tr>
@@ -74,13 +147,61 @@
         </tr>
       </thead>
       <tbody id="corpoTarefas">
-        <!-- Tarefas virão aqui via JS -->
+        <!-- Preenchido via JS -->
       </tbody>
     </table>
-
-    <button onclick="window.location.href='painel.html'">Voltar</button>
+    <button class="btn-voltar" onclick="window.location.href='painel.html'">Voltar</button>
   </div>
 
-  <script src="js/listarTarefas.js"></script>
+  <script>
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    }
+
+    const token = localStorage.getItem('token');
+
+    async function listarTarefas() {
+      try {
+        const res = await fetch('/api/tarefas', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error('Falha ao buscar tarefas');
+        }
+
+        const tarefas = await res.json();
+        const corpoTabela = document.getElementById('corpoTarefas');
+        corpoTabela.innerHTML = '';
+
+        if (tarefas.length === 0) {
+          const linha = document.createElement('tr');
+          linha.innerHTML = '<td colspan="5">Nenhuma tarefa encontrada.</td>';
+          corpoTabela.appendChild(linha);
+          return;
+        }
+
+        tarefas.forEach(t => {
+          const linha = document.createElement('tr');
+          linha.innerHTML = `
+            <td>${t.id}</td>
+            <td>${t.titulo}</td>
+            <td>${t.status}</td>
+            <td>${t.nomeCriador || 'Desconhecido'}</td>
+            <td>${t.responsavel || '-'}</td>
+          `;
+          corpoTabela.appendChild(linha);
+        });
+      } catch (erro) {
+        console.error('Erro ao listar tarefas:', erro);
+        alert('Erro ao carregar tarefas.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', listarTarefas);
+  </script>
 </body>
 </html>

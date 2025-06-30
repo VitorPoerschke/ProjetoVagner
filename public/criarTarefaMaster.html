@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Painel</title>
+  <title>Criar Tarefa - Master</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
   <style>
     * {
@@ -58,19 +58,32 @@
       font-size: 24px;
     }
 
-    .btn {
+    form {
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    input, textarea {
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      background-color: #2e2e36;
+      color: white;
+    }
+
+    button {
       background-color: #3c3f4a;
       color: white;
       padding: 10px 16px;
       border: none;
       border-radius: 6px;
-      margin-right: 10px;
       cursor: pointer;
-      transition: background 0.2s;
-      margin-bottom: 10px;
+      width: fit-content;
     }
 
-    .btn:hover {
+    button:hover {
       background-color: #575b6d;
     }
   </style>
@@ -85,40 +98,50 @@
         <a href="#">Clientes</a>
       </nav>
     </div>
-    <button class="btn" onclick="logout()">Sair</button>
+    <button onclick="logout()">Sair</button>
   </aside>
 
   <main>
-    <h2 id="userRole">Bem-vindo, ...</h2>
-    <button class="btn" onclick="irParaCriarTarefa()">Criar Tarefa</button>
-    <button id="btnAtribuir" class="btn" onclick="window.location.href='atribuirResponsavel.html'">Atribuir Responsável</button>
-    <button id="btnStatus" class="btn" onclick="window.location.href='alterarStatus.html'">Alterar Status</button>
-    <button id="btnHistorico" class="btn" onclick="window.location.href='verHistorico.html'">Ver Histórico</button>
+    <h2>Criar Tarefa (Master)</h2>
+
+    <form id="formCriarTarefa">
+      <input type="text" id="titulo" placeholder="Título da Tarefa" required />
+      <textarea id="descricao" placeholder="Descrição detalhada" rows="5" required></textarea>
+      <button type="submit">Criar</button>
+    </form>
   </main>
 
   <script>
     const token = localStorage.getItem('token');
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const role = payload.role;
-    document.getElementById('userRole').innerText = `Bem-vindo, ${role}`;
 
-    if (role === 'cliente') {
-      document.getElementById('btnAtribuir').style.display = 'none';
-      document.getElementById('btnStatus').style.display = 'none';
-      document.getElementById('btnHistorico').style.display = 'none';
-    }
+    document.getElementById('formCriarTarefa').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const titulo = document.getElementById('titulo').value;
+      const descricao = document.getElementById('descricao').value;
+
+      try {
+        const res = await fetch('/api/tarefas', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ titulo, descricao })
+        });
+
+        if (!res.ok) throw new Error('Erro ao criar tarefa');
+
+        alert('Tarefa criada com sucesso!');
+        window.location.href = 'listarTarefas.html';
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao criar tarefa');
+      }
+    });
 
     function logout() {
       localStorage.removeItem('token');
       window.location.href = 'index.html';
-    }
-
-    function irParaCriarTarefa() {
-      if (role === 'master') {
-        window.location.href = 'criarTarefaMaster.html';
-      } else {
-        window.location.href = 'criarTarefa.html';
-      }
     }
   </script>
 </body>

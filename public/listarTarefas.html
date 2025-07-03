@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>Tarefas Recebidas</title>
-  <style>
-    * {
+  <style>  * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+
 
     body {
       display: flex;
@@ -17,6 +17,7 @@
       color: #fff;
       height: 100vh;
     }
+
 
     .sidebar {
       width: 200px;
@@ -27,6 +28,7 @@
       justify-content: space-between;
     }
 
+
     .sidebar h1 {
       font-size: 20px;
       margin-bottom: 40px;
@@ -34,11 +36,13 @@
       text-align: center;
     }
 
+
     .menu {
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
+
 
     .menu a {
       color: #e0e0e0;
@@ -49,9 +53,11 @@
       transition: background 0.2s;
     }
 
+
     .menu a:hover {
       background-color: #2e2e3e;
     }
+
 
     .logout {
       background-color: #2d2d40;
@@ -63,9 +69,11 @@
       font-weight: bold;
     }
 
+
     .logout:hover {
       background-color: #3b3b55;
     }
+
 
     .main {
       flex: 1;
@@ -74,11 +82,13 @@
       overflow-y: auto;
     }
 
+
     .main h2 {
       margin-bottom: 20px;
       font-size: 24px;
       color: #fefefe;
     }
+
 
     table {
       width: 100%;
@@ -89,20 +99,24 @@
       overflow: hidden;
     }
 
+
     th, td {
       padding: 12px 10px;
       text-align: center;
       border-bottom: 1px solid #ccc;
     }
 
+
     th {
       background-color: #f4f4f4;
       font-weight: bold;
     }
 
+
     tr:nth-child(even) {
       background-color: #fafafa;
     }
+
 
     .btn-voltar {
       margin-top: 25px;
@@ -116,9 +130,25 @@
       display: inline-block;
     }
 
+
     .btn-voltar:hover {
       background-color: #4338ca;
     }
+    
+button {
+    padding: 6px 10px;
+    background-color: #4f46e5;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    margin-left: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  button:hover {
+    background-color: #4338ca;
+  }
   </style>
 </head>
 <body>
@@ -163,7 +193,7 @@
     }
 
     async function carregarResponsaveis() {
-      const res = await fetch('/api/usuarios/responsaveis', {
+      const res = await fetch('/api/tarefas/responsaveis/listar', {
         headers: {
           'Authorization': 'Bearer ' + token
         }
@@ -181,12 +211,8 @@
         await carregarResponsaveis();
 
         const res = await fetch('/api/tarefas', {
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
+          headers: { 'Authorization': 'Bearer ' + token }
         });
-
-        if (!res.ok) throw new Error('Erro ao buscar tarefas');
 
         const tarefas = await res.json();
         const corpoTabela = document.getElementById('corpoTarefas');
@@ -205,12 +231,21 @@
               ${usuariosResponsaveis.map(r => `<option value="${r.id}" ${r.id === t.responsavel ? 'selected' : ''}>${r.nome}</option>`).join('')}
             </select>
             <button onclick="atribuirResponsavel(${t.id})">Atribuir</button>
-          ` : t.responsavel || '-';
+          ` : t.responsavelNome || '-';
 
           linha.innerHTML = `
             <td>${t.id}</td>
             <td>${t.titulo}</td>
-            <td>${t.status}</td>
+            <td>  
+               ${userRole === 'master' || userRole === 'responsavel' ? `
+                 <select id="status-${t.id}">
+                  <option value="pendente" ${t.status === 'pendente' ? 'selected' : ''}>Pendente</option>
+                  <option value="em andamento" ${t.status === 'em andamento' ? 'selected' : ''}>Em Andamento</option>
+                   <option value="concluido" ${t.status === 'concluido' ? 'selected' : ''}>Concluído</option>
+                </select>
+               <button onclick="alterarStatus(${t.id})">OK</button>
+             ` : t.status}
+            </td>
             <td>${t.nomeCriador || 'Desconhecido'}</td>
             <td>${t.responsavelNome || '-'}</td>
             <td>${selectResponsavel}</td>
@@ -250,9 +285,37 @@
         console.error(err);
         alert('Erro ao atribuir responsável.');
       }
+
+      //novo  v2
+
+      async function alterarStatus(id) {
+  const select = document.getElementById(`status-${id}`);
+  const novoStatus = select.value;
+
+  try {
+    const res = await fetch(`/api/tarefas/${id}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ status: novoStatus })
+    });
+
+    if (!res.ok) throw new Error('Erro ao atualizar status');
+
+    alert('Status atualizado com sucesso!');
+    listarTarefas();
+  } catch (err) {
+    console.error('Erro ao alterar status:', err);
+    alert('Erro ao atualizar status');
+  }
+}
+
     }
 
     document.addEventListener('DOMContentLoaded', listarTarefas);
   </script>
 </body>
 </html>
+

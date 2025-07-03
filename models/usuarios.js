@@ -12,14 +12,14 @@ const usuarios = [
 
   {
     id: 2,
-    nome: 'cliente',
+    nome: 'cliente jurandir',
     email: 'jurandir@site.com',
     senha: bcrypt.hashSync('123456', 8), // Senha já criptografada
     role: 'cliente', // Pode ser: master, cliente, gerenciador, advogado
   }, 
   {
    id: 3,
-    nome: "Exemplo Advogado",
+    nome: "Exemplo Advogado rogerio",
     email: "advogado@email.com",
     senha: bcrypt.hashSync('123456', 8),
     role: "responsavel"

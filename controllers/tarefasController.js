@@ -1,7 +1,7 @@
 const tarefas = require('../models/tarefas');
-
-
 const usuarios = require('../models/usuarios');
+const historicoTarefas = [];
+
 
 exports.listarTarefas = (req, res) => {
   try {
@@ -12,15 +12,23 @@ exports.listarTarefas = (req, res) => {
     if (user.role === 'master') {
       tarefasFiltradas = tarefas.map(t => {
         const criador = usuarios.find(u => u.id === t.usuarioId);
+        const responsavel = usuarios.find(u => u.id === t.responsavel);
+
         return {
           ...t,
-          nomeCriador: t.usuarioId === user.id ? 'Você' : (criador ? criador.nome : 'Desconhecido')
+          nomeCriador: t.usuarioId === user.id ? 'Você' : (criador ? criador.nome : 'Desconhecido'),
+          responsavelNome: responsavel ? responsavel.nome : '-'
         };
       });
+
     } else if (user.role === 'cliente') {
       tarefasFiltradas = tarefas
         .filter(t => t.usuarioId === user.id)
-        .map(t => ({ ...t, nomeCriador: 'Você' }));
+        .map(t => ({
+          ...t,
+          nomeCriador: 'Você'
+        }));
+
     } else if (user.role === 'responsavel') {
       tarefasFiltradas = tarefas
         .filter(t => t.responsavel === user.id)
@@ -28,9 +36,10 @@ exports.listarTarefas = (req, res) => {
           const criador = usuarios.find(u => u.id === t.usuarioId);
           return {
             ...t,
-            nomeCriador: t.usuarioId === user.id ? 'Você' : (criador ? criador.nome : 'Desconhecido')
+            nomeCriador: criador ? criador.nome : 'Desconhecido'
           };
         });
+
     } else {
       return res.status(403).json({ erro: 'Acesso negado' });
     }
@@ -41,6 +50,7 @@ exports.listarTarefas = (req, res) => {
     res.status(500).json({ erro: 'Erro interno ao listar tarefas' });
   }
 };
+
 
 
 // Buscar por ID
@@ -116,31 +126,44 @@ exports.atribuirResponsavel = (req, res) => {
   }
 };
 
-
-// Atualizar status
+// Atualizar status da tarefa v2
 exports.atualizarStatus = (req, res) => {
+  try {
     const id = parseInt(req.params.id);
     const { status } = req.body;
-    const tarefa = tarefas.find(t => t.id === id);
 
-    if (!tarefa) return res.status(404).json({ erro: 'Tarefa não encontrada' });
+    const tarefaIndex = tarefas.findIndex(t => t.id === id);
+    if (tarefaIndex === -1) return res.status(404).json({ erro: 'Tarefa não encontrada' });
 
+    const tarefa = tarefas[tarefaIndex];
     tarefa.status = status;
+
+    // Se for concluído, move pro histórico e remove da lista ativa
+    if (status === 'concluido') {
+      historicoTarefas.push({ ...tarefa });
+      tarefas.splice(tarefaIndex, 1);
+    }
 
     console.log(`Status da tarefa ${id} atualizado para: ${status}`);
     res.json({ mensagem: 'Status atualizado', tarefa });
+
+  } catch (err) {
+    console.error('Erro ao atualizar status:', err.message);
+    res.status(500).json({ erro: 'Erro interno ao atualizar status' });
+  }
 };
 
-// Histórico (listar concluídas)
+// Histórico (listar concluídas) v2
 exports.historicoConcluidas = (req, res) => {
-    const concluidas = tarefas.filter(t => t.status === 'concluido');
-
-    if (req.user.tipo === 'Master') {
-        // Master vê todas as concluídas
-        res.json(concluidas);
+  try {
+    if (req.user.role === 'master') {
+      res.json(historicoTarefas);
     } else {
-        // Cliente vê só as que ele criou
-        const minhas = concluidas.filter(t => t.usuarioId === req.user.id);
-        res.json(minhas);
+      const minhas = historicoTarefas.filter(t => t.usuarioId === req.user.id);
+      res.json(minhas);
     }
+  } catch (err) {
+    console.error('Erro ao buscar histórico:', err.message);
+    res.status(500).json({ erro: 'Erro interno ao buscar histórico' });
+  }
 };

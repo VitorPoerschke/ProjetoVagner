@@ -144,60 +144,111 @@
           <th>Status</th>
           <th>Criador</th>
           <th>Responsável</th>
+          <th>Ações</th>
         </tr>
       </thead>
-      <tbody id="corpoTarefas">
-        <!-- Preenchido via JS -->
-      </tbody>
+      <tbody id="corpoTarefas"></tbody>
     </table>
     <button class="btn-voltar" onclick="window.location.href='painel.html'">Voltar</button>
   </div>
 
   <script>
+    const token = localStorage.getItem('token');
+    let usuariosResponsaveis = [];
+    let userRole = '';
+
     function logout() {
       localStorage.removeItem('token');
       window.location.href = 'index.html';
     }
 
-    const token = localStorage.getItem('token');
+    async function carregarResponsaveis() {
+      const res = await fetch('/api/usuarios/responsaveis', {
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      });
+      if (res.ok) {
+        usuariosResponsaveis = await res.json();
+      }
+    }
 
     async function listarTarefas() {
       try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        userRole = payload.role;
+
+        await carregarResponsaveis();
+
         const res = await fetch('/api/tarefas', {
           headers: {
             'Authorization': 'Bearer ' + token
           }
         });
 
-        if (!res.ok) {
-          throw new Error('Falha ao buscar tarefas');
-        }
+        if (!res.ok) throw new Error('Erro ao buscar tarefas');
 
         const tarefas = await res.json();
         const corpoTabela = document.getElementById('corpoTarefas');
         corpoTabela.innerHTML = '';
 
         if (tarefas.length === 0) {
-          const linha = document.createElement('tr');
-          linha.innerHTML = '<td colspan="5">Nenhuma tarefa encontrada.</td>';
-          corpoTabela.appendChild(linha);
+          corpoTabela.innerHTML = '<tr><td colspan="6">Nenhuma tarefa encontrada.</td></tr>';
           return;
         }
 
         tarefas.forEach(t => {
           const linha = document.createElement('tr');
+          const selectResponsavel = userRole === 'master' ? `
+            <select id="select-${t.id}">
+              <option value="">-- Escolher --</option>
+              ${usuariosResponsaveis.map(r => `<option value="${r.id}" ${r.id === t.responsavel ? 'selected' : ''}>${r.nome}</option>`).join('')}
+            </select>
+            <button onclick="atribuirResponsavel(${t.id})">Atribuir</button>
+          ` : t.responsavel || '-';
+
           linha.innerHTML = `
             <td>${t.id}</td>
             <td>${t.titulo}</td>
             <td>${t.status}</td>
             <td>${t.nomeCriador || 'Desconhecido'}</td>
-            <td>${t.responsavel || '-'}</td>
+            <td>${t.responsavelNome || '-'}</td>
+            <td>${selectResponsavel}</td>
           `;
           corpoTabela.appendChild(linha);
         });
       } catch (erro) {
         console.error('Erro ao listar tarefas:', erro);
         alert('Erro ao carregar tarefas.');
+      }
+    }
+
+    async function atribuirResponsavel(tarefaId) {
+      const select = document.getElementById(`select-${tarefaId}`);
+      const responsavelId = select.value;
+
+      if (!responsavelId) {
+        alert('Selecione um responsável');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/tarefas/${tarefaId}/atribuir`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ responsavelId })
+        });
+
+        if (!res.ok) throw new Error('Erro ao atribuir responsável');
+
+        alert('Responsável atribuído com sucesso!');
+        listarTarefas();
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao atribuir responsável.');
       }
     }
 

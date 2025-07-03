@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel do Responsável</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      background-color: #1e1e24;
+      color: white;
+    }
+
+    aside {
+      width: 220px;
+      background-color: #141418;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    aside h1 {
+      font-size: 20px;
+      margin-bottom: 40px;
+    }
+
+    aside nav a {
+      display: block;
+      padding: 12px 10px;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    aside nav a:hover {
+      background-color: #2e2e36;
+    }
+
+    main {
+      flex: 1;
+      padding: 40px;
+    }
+
+    h2 {
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+
+    .btn {
+      background-color: #3c3f4a;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      margin-right: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background-color: #575b6d;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #333;
+      text-align: left;
+    }
+
+    th {
+      background-color: #2e2e36;
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <div>
+      <h1>⚖️</h1>
+      <nav>
+        <a href="#">Painel</a>
+      </nav>
+    </div>
+    <button class="btn" onclick="logout()">Sair</button>
+  </aside>
+
+  <main>
+    <h2>Tarefas Atribuídas</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Descrição</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="corpoTarefas"></tbody>
+    </table>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('token');
+
+    async function carregarTarefas() {
+      try {
+        const res = await fetch('/api/tarefas', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!res.ok) throw new Error('Erro ao buscar tarefas');
+
+        const tarefas = await res.json();
+        const corpo = document.getElementById('corpoTarefas');
+        corpo.innerHTML = '';
+
+        if (tarefas.length === 0) {
+          corpo.innerHTML = '<tr><td colspan="4">Nenhuma tarefa atribuída.</td></tr>';
+          return;
+        }
+
+        tarefas.forEach(t => {
+          const linha = document.createElement('tr');
+          linha.innerHTML = `
+            <td>${t.id}</td>
+            <td>${t.titulo}</td>
+            <td>${t.descricao}</td>
+            <td>${t.status}</td>
+          `;
+          corpo.appendChild(linha);
+        });
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao carregar tarefas');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarTarefas);
+  </script>
+</body>
+</html>

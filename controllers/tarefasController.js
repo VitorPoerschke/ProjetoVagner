@@ -5,28 +5,40 @@ const usuarios = require('../models/usuarios');
 
 exports.listarTarefas = (req, res) => {
   try {
-    if (req.user.role === 'master') {
-      const tarefasComNomes = tarefas.map(t => {
-        const usuario = usuarios.find(u => u.id === t.usuarioId);
+    const user = req.user;
+
+    let tarefasFiltradas = [];
+
+    if (user.role === 'master') {
+      tarefasFiltradas = tarefas.map(t => {
+        const criador = usuarios.find(u => u.id === t.usuarioId);
         return {
           ...t,
-          nomeCriador: usuario ? usuario.nome : 'Desconhecido'
+          nomeCriador: t.usuarioId === user.id ? 'Você' : (criador ? criador.nome : 'Desconhecido')
         };
       });
-
-      return res.json(tarefasComNomes);
+    } else if (user.role === 'cliente') {
+      tarefasFiltradas = tarefas
+        .filter(t => t.usuarioId === user.id)
+        .map(t => ({ ...t, nomeCriador: 'Você' }));
+    } else if (user.role === 'responsavel') {
+      tarefasFiltradas = tarefas
+        .filter(t => t.responsavel === user.id)
+        .map(t => {
+          const criador = usuarios.find(u => u.id === t.usuarioId);
+          return {
+            ...t,
+            nomeCriador: t.usuarioId === user.id ? 'Você' : (criador ? criador.nome : 'Desconhecido')
+          };
+        });
+    } else {
+      return res.status(403).json({ erro: 'Acesso negado' });
     }
 
-    // Cliente: retorna só suas tarefas e define "Você" como nomeCriador
-const tarefasDoUsuario = tarefas
-  .filter(t => t.usuarioId === req.user.id)
-  .map(t => ({ ...t, nomeCriador: 'Você' }));
-
-return res.json(tarefasDoUsuario);
-
-  } catch (err) {
-    console.error('Erro no listarTarefas:', err.message);
-    return res.status(500).json({ erro: 'Erro interno ao listar tarefas' });
+    res.json(tarefasFiltradas);
+  } catch (erro) {
+    console.error('Erro ao listar tarefas:', erro.message);
+    res.status(500).json({ erro: 'Erro interno ao listar tarefas' });
   }
 };
 
@@ -80,17 +92,30 @@ exports.deletarTarefa = (req, res) => {
     res.json({ mensagem: 'Tarefa deletada com sucesso' });
 };
 
-// Atribuir responsável
+// Atribuir responsável v2 novo
 exports.atribuirResponsavel = (req, res) => {
-    const id = parseInt(req.params.id);
-    const { responsavel } = req.body;
-    const tarefa = tarefas.find(t => t.id === id);
+  try {
+    const user = req.user;
 
+    if (user.role !== 'master') {
+      return res.status(403).json({ erro: 'Apenas administradores podem atribuir responsáveis' });
+    }
+
+    const tarefa = tarefas.find(t => t.id === parseInt(req.params.id));
     if (!tarefa) return res.status(404).json({ erro: 'Tarefa não encontrada' });
 
-    tarefa.responsavel = responsavel;
-    res.json({ mensagem: 'Responsável atribuído', tarefa });
+    const responsavel = usuarios.find(u => u.id === parseInt(req.body.responsavelId) && u.role === 'responsavel');
+    if (!responsavel) return res.status(404).json({ erro: 'Responsável inválido' });
+
+    tarefa.responsavel = responsavel.id;
+
+    res.json({ mensagem: 'Responsável atribuído com sucesso', tarefa });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro interno ao atribuir responsável' });
+  }
 };
+
 
 // Atualizar status
 exports.atualizarStatus = (req, res) => {

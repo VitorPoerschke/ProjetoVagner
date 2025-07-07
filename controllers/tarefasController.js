@@ -153,17 +153,34 @@ exports.atualizarStatus = (req, res) => {
   }
 };
 
-// Histórico (listar concluídas) v2
+// Histórico (listar concluídas)v4
 exports.historicoConcluidas = (req, res) => {
   try {
-    if (req.user.role === 'master') {
-      res.json(historicoTarefas);
-    } else {
-      const minhas = historicoTarefas.filter(t => t.usuarioId === req.user.id);
-      res.json(minhas);
+    const user = req.user;
+
+    let concluidas = historicoTarefas;
+
+    if (user.role === 'cliente') {
+      concluidas = concluidas.filter(t => t.usuarioId === user.id);
+    } else if (user.role === 'responsavel') {
+      concluidas = concluidas.filter(t => t.responsavel === user.id);
     }
+
+    const tarefasComNomes = concluidas.map(t => {
+      const criador = usuarios.find(u => u.id === t.usuarioId);
+      const responsavel = usuarios.find(u => u.id === t.responsavel);
+      return {
+        ...t,
+        nomeCriador: criador ? criador.nome : 'Desconhecido',
+        responsavelNome: responsavel ? responsavel.nome : '-'
+      };
+    });
+
+    res.json(tarefasComNomes);
   } catch (err) {
-    console.error('Erro ao buscar histórico:', err.message);
-    res.status(500).json({ erro: 'Erro interno ao buscar histórico' });
+    console.error('Erro ao listar histórico:', err.message);
+    res.status(500).json({ erro: 'Erro interno ao listar histórico' });
   }
 };
+
+

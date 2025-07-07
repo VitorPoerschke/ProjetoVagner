@@ -3,12 +3,176 @@
 <head>
   <meta charset="UTF-8">
   <title>Histórico de Tarefas</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      background-color: #1e1e24;
+      color: white;
+    }
+
+    aside {
+      width: 220px;
+      background-color: #141418;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    aside h1 {
+      font-size: 20px;
+      margin-bottom: 40px;
+    }
+
+    aside nav a {
+      display: block;
+      padding: 12px 10px;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    aside nav a:hover {
+      background-color: #2e2e36;
+    }
+
+    main {
+      flex: 1;
+      padding: 40px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #2e2e36;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #444;
+      text-align: center;
+    }
+
+    th {
+      background-color: #3c3f4a;
+    }
+
+    tr:nth-child(even) {
+      background-color: #383a45;
+    }
+
+    .btn-voltar {
+      margin-top: 20px;
+      padding: 10px 16px;
+      border: none;
+      background-color: #4f46e5;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-voltar:hover {
+      background-color: #4338ca;
+    }
+  </style>
 </head>
 <body>
-  <h2>Histórico de Tarefas</h2>
-  <ul id="historicoList"></ul>
-  <button onclick="window.location.href='painel.html'">Voltar</button>
+  <aside>
+    <div>
+      <h1>⚖️</h1>
+      <nav>
+        <a href="painel.html">Painel</a>
+        <a href="listarTarefas.html">Tarefas</a>
+        <a href="#">Clientes</a>
+      </nav>
+    </div>
+    <button class="btn-voltar" onclick="logout()">Sair</button>
+  </aside>
 
-  <script src="js/verHistorico.js"></script>
+  <main>
+    <h2>Histórico de Tarefas Concluídas</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Criador</th>
+          <th>Responsável</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="corpoHistorico">
+        <!-- Preenchido via JS -->
+      </tbody>
+    </table>
+
+    <button class="btn-voltar" onclick="window.location.href='painel.html'">Voltar</button>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('token');
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    }
+
+    async function carregarHistorico() {
+      try {
+        const res = await fetch('/api/tarefas/historico/concluidas', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!res.ok) throw new Error('Falha ao buscar histórico');
+
+        const tarefas = await res.json();
+        const corpo = document.getElementById('corpoHistorico');
+        corpo.innerHTML = '';
+
+        if (tarefas.length === 0) {
+          corpo.innerHTML = '<tr><td colspan="5">Nenhuma tarefa concluída.</td></tr>';
+          return;
+        }
+
+        tarefas.forEach(t => {
+          const linha = document.createElement('tr');
+          linha.innerHTML = `
+            <td>${t.id}</td>
+            <td>${t.titulo}</td>
+            <td>${t.nomeCriador || 'Desconhecido'}</td>
+            <td>${t.responsavelNome || '-'}</td>
+            <td>${t.status}</td>
+          `;
+          corpo.appendChild(linha);
+        });
+
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao carregar histórico.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarHistorico);
+  </script>
 </body>
 </html>

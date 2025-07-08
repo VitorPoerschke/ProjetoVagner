@@ -110,7 +110,9 @@
 
   <main>
     <h2>Histórico de Tarefas Concluídas</h2>
-
+    <div style="background-color: #ffcc00; color: #000; padding: 10px; border-radius: 6px; margin-bottom: 20px;">
+      ⚠️ As tarefas concluídas são removidas automaticamente após 30 dias.
+    </div>
     <table>
       <thead>
         <tr>
@@ -128,51 +130,102 @@
 
     <button class="btn-voltar" onclick="window.location.href='painel.html'">Voltar</button>
   </main>
-
   <script>
-    const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token');
+  const payload = JSON.parse(atob(token.split('.')[1]));
+  const role = payload.role;
 
-    function logout() {
-      localStorage.removeItem('token');
-      window.location.href = 'index.html';
-    }
+  function logout() {
+    localStorage.removeItem('token');
+    window.location.href = 'index.html';
+  }
 
-    async function carregarHistorico() {
-      try {
-        const res = await fetch('/api/tarefas/historico/concluidas', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
+  async function carregarHistorico() {
+    try {
+      const res = await fetch('/api/tarefas/historico/concluidas', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
 
-        if (!res.ok) throw new Error('Falha ao buscar histórico');
+      if (!res.ok) throw new Error('Falha ao buscar histórico');
 
-        const tarefas = await res.json();
-        const corpo = document.getElementById('corpoHistorico');
-        corpo.innerHTML = '';
+      const tarefas = await res.json();
+      const corpo = document.getElementById('corpoHistorico');
+      corpo.innerHTML = '';
 
-        if (tarefas.length === 0) {
-          corpo.innerHTML = '<tr><td colspan="5">Nenhuma tarefa concluída.</td></tr>';
-          return;
-        }
-
-        tarefas.forEach(t => {
-          const linha = document.createElement('tr');
-          linha.innerHTML = `
-            <td>${t.id}</td>
-            <td>${t.titulo}</td>
-            <td>${t.nomeCriador || 'Desconhecido'}</td>
-            <td>${t.responsavelNome || '-'}</td>
-            <td>${t.status}</td>
-          `;
-          corpo.appendChild(linha);
-        });
-
-      } catch (err) {
-        console.error(err);
-        alert('Erro ao carregar histórico.');
+      if (tarefas.length === 0) {
+        corpo.innerHTML = '<tr><td colspan="5">Nenhuma tarefa concluída.</td></tr>';
+        return;
       }
-    }
 
-    document.addEventListener('DOMContentLoaded', carregarHistorico);
-  </script>
+      tarefas.forEach(t => {
+        const linha = document.createElement('tr');
+        linha.innerHTML = `
+          <td>${t.id}</td>
+          <td>${t.titulo}</td>
+          <td>${t.nomeCriador || 'Desconhecido'}</td>
+          <td>${t.responsavelNome || '-'}</td>
+          <td>
+            ${t.status}
+            ${role === 'master' ? `
+              <br>
+              <button onclick="restaurarTarefa(${t.id})" style="margin-top:4px;">Restaurar</button>
+              <button onclick="excluirTarefa(${t.id})" style="margin-top:4px; background-color: crimson; color: white;">Excluir</button>
+            ` : ''}
+          </td>
+        `;
+        corpo.appendChild(linha);
+      });
+
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao carregar histórico.');
+    }
+  }
+
+  async function restaurarTarefa(id) {
+    try {
+      const res = await fetch(`/api/tarefas/historico/${id}/restaurar`, {
+        method: 'PUT',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.erro || 'Erro ao restaurar');
+
+      alert(data.mensagem);
+      carregarHistorico();
+
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao restaurar tarefa.');
+    }
+  }
+
+  async function excluirTarefa(id) {
+    if (!confirm('Tem certeza que deseja excluir permanentemente?')) return;
+
+    try {
+      const res = await fetch(`/api/tarefas/historico/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.erro || 'Erro ao excluir');
+
+      alert(data.mensagem);
+      carregarHistorico();
+
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao excluir tarefa.');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', carregarHistorico);
+</script>
+
 </body>
 </html>

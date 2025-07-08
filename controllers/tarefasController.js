@@ -140,9 +140,12 @@ exports.atualizarStatus = (req, res) => {
 
     // Se for concluído, move pro histórico e remove da lista ativa
     if (status === 'concluido') {
-      historicoTarefas.push({ ...tarefa });
-      tarefas.splice(tarefaIndex, 1);
-    }
+  historicoTarefas.push({ 
+    ...tarefa,
+    dataConclusao: new Date()
+  });
+  tarefas.splice(tarefaIndex, 1);
+}
 
     console.log(`Status da tarefa ${id} atualizado para: ${status}`);
     res.json({ mensagem: 'Status atualizado', tarefa });
@@ -183,4 +186,51 @@ exports.historicoConcluidas = (req, res) => {
   }
 };
 
+// Restaurar tarefa do histórico v1
+exports.restaurarTarefa = (req, res) => {
+  try {
+    const user = req.user;
+    if (user.role !== 'master') {
+      return res.status(403).json({ erro: 'Apenas o master pode restaurar tarefas' });
+    }
 
+    const id = parseInt(req.params.id);
+    const index = historicoTarefas.findIndex(t => t.id === id);
+
+    if (index === -1) {
+      return res.status(404).json({ erro: 'Tarefa não encontrada no histórico' });
+    }
+
+    const restaurada = historicoTarefas.splice(index, 1)[0];
+    restaurada.status = 'pendente';
+    tarefas.push(restaurada);
+
+    res.json({ mensagem: 'Tarefa restaurada com sucesso', tarefa: restaurada });
+  } catch (err) {
+    console.error('Erro ao restaurar tarefa:', err.message);
+    res.status(500).json({ erro: 'Erro interno ao restaurar tarefa' });
+  }
+};
+
+// Excluir tarefa do histórico v1
+exports.excluirTarefaHistorico = (req, res) => {
+  try {
+    const user = req.user;
+    if (user.role !== 'master') {
+      return res.status(403).json({ erro: 'Apenas o master pode excluir tarefas do histórico' });
+    }
+
+    const id = parseInt(req.params.id);
+    const index = historicoTarefas.findIndex(t => t.id === id);
+
+    if (index === -1) {
+      return res.status(404).json({ erro: 'Tarefa não encontrada no histórico' });
+    }
+
+    historicoTarefas.splice(index, 1);
+    res.json({ mensagem: 'Tarefa excluída permanentemente' });
+  } catch (err) {
+    console.error('Erro ao excluir tarefa do histórico:', err.message);
+    res.status(500).json({ erro: 'Erro interno ao excluir tarefa' });
+  }
+};

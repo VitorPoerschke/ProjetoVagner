@@ -347,7 +347,13 @@ button {
         const tarefa = await res.json();
 
         document.getElementById('modalDescricao').innerText = tarefa.descricao || 'Sem descrição';
-        document.getElementById('modalAnexo').innerText = tarefa.anexo || 'Nenhum';
+          const anexoSpan = document.getElementById('modalAnexo');
+            if (tarefa.anexo) {
+          anexoSpan.innerHTML = `<a href="/uploads/${tarefa.anexo}" download="${tarefa.anexo}">${tarefa.anexo}</a>`;
+           } else {
+         anexoSpan.innerText = 'Nenhum';
+       }
+
 
         document.getElementById('modalDetalhes').style.display = 'flex';
       } catch (err) {
@@ -368,7 +374,7 @@ button {
     <div class="modal-content">
       <h3>Detalhes da Tarefa</h3>
       <p><strong>Descrição:</strong> <span id="modalDescricao"></span></p>
-      <p><strong>Anexo:</strong> <span id="modalAnexo">Nenhum</span></p>
+      <p><strong>Anexo:</strong> <span id="modalAnexo"></span></p>
       <button onclick="fecharModal()">Fechar</button>
     </div>
   </div>

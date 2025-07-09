@@ -3,10 +3,11 @@ const router = express.Router();
 const tarefaController = require('../controllers/tarefasController');
 const autenticarToken = require('../middleware/auth');
 const usuarios = require('../models/usuarios');
+const upload = require('../middleware/upload'); // Novo: middleware do multer
 
 // ROTAS PADRÕES
 router.get('/', autenticarToken, tarefaController.listarTarefas);
-router.post('/', autenticarToken, tarefaController.criarTarefa);
+router.post('/', autenticarToken, upload.single('anexo'), tarefaController.criarTarefa); // Atualizado com suporte a arquivo
 router.put('/:id', autenticarToken, tarefaController.atualizarTarefa);
 router.delete('/:id', autenticarToken, tarefaController.deletarTarefa);
 router.put('/:id/atribuir', autenticarToken, tarefaController.atribuirResponsavel);

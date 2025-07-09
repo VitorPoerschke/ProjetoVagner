@@ -61,22 +61,26 @@ exports.buscarTarefaPorId = (req, res) => {
     res.json(tarefa);
 };
 
-// Criar nova tarefa
+// Criar nova tarefa V2
 exports.criarTarefa = (req, res) => {
-    const { titulo, descricao } = req.body;
-    if (!titulo || !descricao) return res.status(400).json({ erro: 'Campos obrigatórios' });
+  const { titulo, descricao } = req.body;
 
-    const novaTarefa = {
-        id: tarefas.length + 1,
-        titulo,
-        descricao,
-        status: 'pendente',
-        responsavel: '',
-        usuarioId: req.user.id
-    };
+  if (!titulo || !descricao) return res.status(400).json({ erro: 'Campos obrigatórios' });
 
-    tarefas.push(novaTarefa);
-    res.status(201).json(novaTarefa);
+  const anexo = req.file ? req.file.filename : null;
+
+  const novaTarefa = {
+    id: tarefas.length + 1,
+    titulo,
+    descricao,
+    status: 'pendente',
+    responsavel: '',
+    usuarioId: req.user.id,
+    anexo
+  };
+
+  tarefas.push(novaTarefa);
+  res.status(201).json(novaTarefa);
 };
 
 // Atualizar tarefa

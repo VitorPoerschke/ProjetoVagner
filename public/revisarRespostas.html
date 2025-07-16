@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Revisar Respostas - Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      background-color: #1e1e24;
+      color: #fff;
+    }
+
+    .sidebar {
+      width: 240px;
+      background-color: #141418;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 40px;
+      color: #facc15;
+    }
+
+    .logo span {
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    .menu a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .menu a:hover {
+      background-color: #2e2e36;
+      transform: translateX(4px);
+    }
+
+    .btn-voltar {
+      background-color: #4f46e5;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn-voltar:hover {
+      background-color: #4338ca;
+    }
+
+    .main {
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+    }
+
+    .main h1 {
+      font-size: 26px;
+      margin-bottom: 30px;
+    }
+
+    .tarefa {
+      background-color: #2e2e36;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .tarefa h3 {
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .tarefa p {
+      margin: 6px 0;
+    }
+
+    .tarefa a {
+      color: #7dd3fc;
+      text-decoration: underline;
+    }
+
+    .botoes {
+      margin-top: 12px;
+    }
+
+    .botoes button {
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 10px;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .botoes button:hover {
+      background-color: #4338ca;
+      transform: scale(1.05);
+    }
+
+    .vazio {
+      font-style: italic;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div>
+      <div class="logo">⚖️ Vagner Poerschke</div>
+      <div class="menu">
+        <a href="painel.html">📊 Painel</a>
+        <a href="listarTarefas.html">🗂️ Tarefas</a>
+        <a href="revisarRespostas.html">📩 Revisar Respostas</a>
+        <a href="#">👥 Clientes</a>
+      </div>
+    </div>
+    <button class="btn-voltar" onclick="window.location.href='painel.html'">Voltar</button>
+  </div>
+
+  <div class="main">
+    <h1>📩 Revisar Respostas Pendentes</h1>
+    <div id="respostasContainer">Carregando tarefas com resposta...</div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("token");
+    const container = document.getElementById("respostasContainer");
+
+    function concluirTarefa(id) {
+      fetch(`/api/tarefas/${id}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({ status: "concluido" }),
+      })
+        .then((res) => res.json())
+        .then(() => location.reload())
+        .catch(() => alert("Erro ao concluir a tarefa."));
+    }
+
+    function devolverTarefa(id) {
+      const obs = prompt("Digite uma observação para o responsável:");
+      if (!obs) return;
+
+      fetch(`/api/tarefas/${id}/devolver`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({ observacao: obs }),
+      })
+        .then((res) => res.json())
+        .then(() => location.reload())
+        .catch(() => alert("Erro ao devolver tarefa."));
+    }
+
+    async function carregarRespostas() {
+      try {
+        const res = await fetch("/api/tarefas", {
+          headers: { Authorization: "Bearer " + token },
+        });
+        const tarefas = await res.json();
+        const pendentes = tarefas.filter((t) => t.respostaMensagem);
+
+        if (pendentes.length === 0) {
+          container.innerHTML = "<p class='vazio'>Nenhuma tarefa com resposta pendente.</p>";
+          return;
+        }
+
+        container.innerHTML = "";
+
+        pendentes.forEach((tarefa) => {
+          const div = document.createElement("div");
+          div.classList.add("tarefa");
+
+          div.innerHTML = `
+            <h3>${tarefa.titulo}</h3>
+            <p><strong>Descrição:</strong> ${tarefa.descricao}</p>
+            <p><strong>Resposta:</strong> ${tarefa.respostaMensagem}</p>
+            ${tarefa.respostaAnexo
+              ? `<p><strong>Anexo:</strong> <a href="/uploads/${tarefa.respostaAnexo}" target="_blank">Baixar</a></p>`
+              : ""}
+            <div class="botoes">
+              <button onclick="concluirTarefa(${tarefa.id})">Concluir</button>
+              <button onclick="devolverTarefa(${tarefa.id})">Devolver</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = "<p class='vazio'>Erro ao carregar tarefas.</p>";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", carregarRespostas);
+  </script>
+</body>
+</html>

@@ -1,27 +1,26 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Painel do Responsável</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 0;
+      font-family: 'Inter', sans-serif;
     }
-
 
     body {
       display: flex;
       height: 100vh;
       background-color: #1e1e24;
-      color: white;
+      color: #fff;
     }
 
-
-    aside {
-      width: 220px;
+    .sidebar {
+      width: 240px;
       background-color: #141418;
       padding: 30px 20px;
       display: flex;
@@ -29,143 +28,269 @@
       justify-content: space-between;
     }
 
-
-    aside h1 {
-      font-size: 20px;
+    .logo {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 40px;
+      color: #facc15;
     }
 
-
-    aside nav a {
-      display: block;
-      padding: 12px 10px;
+    .menu a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
       color: white;
       text-decoration: none;
       font-weight: 500;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       border-radius: 6px;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.2s;
     }
 
-
-    aside nav a:hover {
+    .menu a:hover {
       background-color: #2e2e36;
+      transform: translateX(4px);
     }
 
-
-    main {
-      flex: 1;
-      padding: 40px;
-    }
-
-
-    h2 {
-      margin-bottom: 30px;
-      font-size: 24px;
-    }
-
-
-    .btn {
-      background-color: #3c3f4a;
+    .btn-voltar {
+      background-color: #4f46e5;
       color: white;
-      padding: 10px 16px;
+      padding: 10px;
       border: none;
       border-radius: 6px;
-      margin-right: 10px;
+      font-weight: bold;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background-color 0.3s;
     }
 
-
-    .btn:hover {
-      background-color: #575b6d;
+    .btn-voltar:hover {
+      background-color: #4338ca;
     }
 
+    .main {
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+    }
+
+    .main h2 {
+      font-size: 26px;
+      margin-bottom: 30px;
+    }
 
     table {
       width: 100%;
-      margin-top: 20px;
       border-collapse: collapse;
+      background-color: #fff;
+      color: #111;
+      border-radius: 8px;
+      overflow: hidden;
     }
-
 
     th, td {
-      padding: 12px;
-      border: 1px solid #333;
-      text-align: left;
+      padding: 12px 10px;
+      text-align: center;
+      border-bottom: 1px solid #ccc;
     }
-
 
     th {
-      background-color: #2e2e36;
+      background-color: #f4f4f4;
+      font-weight: bold;
     }
 
+    tr:nth-child(even) {
+      background-color: #fafafa;
+    }
 
+    button {
+      padding: 6px 10px;
+      background-color: #4f46e5;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #4338ca;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      color: #000;
+      padding: 30px;
+      border-radius: 10px;
+      min-width: 300px;
+    }
+
+    .bolinha {
+      display: inline-block;
+      margin-left: 5px;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      border-radius: 50%;
+      cursor: help;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 5px red;
+      }
+      50% {
+        transform: scale(1.2);
+        box-shadow: 0 0 12px red;
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 5px red;
+      }
+    }
   </style>
 </head>
 <body>
-  <h2>Minhas Tarefas Atribuídas</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Título</th>
-        <th>Descrição</th>
-        <th>Status</th>
-        <th>Criador</th>
-      </tr>
-    </thead>
-    <tbody id="corpoTarefas"></tbody>
-  </table>
 
-  <button onclick="logout()">Sair</button>
+  <div class="sidebar">
+    <div>
+      <div class="logo">⚖️ Vagner Poerschke</div>
+      <div class="menu">
+        <a href="painelResponsavel.html">📂 Minhas Tarefas</a>
+      </div>
+    </div>
+    <button class="btn-voltar" onclick="window.location.href='index.html'">Voltar</button>
+  </div>
+
+  <div class="main">
+    <h2>Suas Tarefas Atribuídas</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Descrição</th>
+          <th>Status</th>
+          <th>Observação</th>
+          <th>Criador</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="corpoTarefas"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal -->
+  <div id="modalResposta" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h3>Responder Tarefa</h3>
+      <form id="formResposta">
+        <input type="hidden" id="tarefaId" />
+        <p><label>Mensagem:</label><br>
+        <textarea id="mensagem" rows="4" style="width: 100%;"></textarea></p>
+        <p><label>Anexo:</label><br>
+        <input type="file" id="anexo" /></p>
+        <button type="submit">Enviar Resposta</button>
+        <button type="button" onclick="fecharModal()">Cancelar</button>
+      </form>
+    </div>
+  </div>
 
   <script>
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
 
     function logout() {
-      localStorage.removeItem('token');
-      window.location.href = 'index.html';
+      localStorage.removeItem("token");
+      window.location.href = "index.html";
     }
 
-    async function listarTarefas() {
+    function abrirModalResposta(id) {
+      document.getElementById("tarefaId").value = id;
+      document.getElementById("modalResposta").style.display = "flex";
+    }
+
+    function fecharModal() {
+      document.getElementById("modalResposta").style.display = "none";
+    }
+
+    document.getElementById("formResposta").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = document.getElementById("tarefaId").value;
+      const mensagem = document.getElementById("mensagem").value;
+      const anexo = document.getElementById("anexo").files[0];
+
+      const formData = new FormData();
+      formData.append("mensagem", mensagem);
+      if (anexo) formData.append("anexo", anexo);
+
       try {
-        const res = await fetch('/api/tarefas', {
+        const res = await fetch(`/api/tarefas/${id}/responder`, {
+          method: "PUT",
           headers: {
-            'Authorization': 'Bearer ' + token
-          }
+            Authorization: "Bearer " + token
+          },
+          body: formData
         });
 
-        if (!res.ok) throw new Error('Erro ao buscar tarefas');
+        if (!res.ok) throw new Error("Erro ao enviar resposta");
 
-        const tarefas = await res.json();
-        const corpo = document.getElementById('corpoTarefas');
-        corpo.innerHTML = '';
-
-        if (tarefas.length === 0) {
-          corpo.innerHTML = '<tr><td colspan="5">Nenhuma tarefa atribuída a você.</td></tr>';
-          return;
-        }
-
-        tarefas.forEach(t => {
-          const linha = document.createElement('tr');
-          linha.innerHTML = `
-            <td>${t.id}</td>
-            <td>${t.titulo}</td>
-            <td>${t.descricao}</td>
-            <td>${t.status}</td>
-            <td>${t.nomeCriador || 'Desconhecido'}</td>
-          `;
-          corpo.appendChild(linha);
-        });
+        alert("Resposta enviada com sucesso!");
+        fecharModal();
+        carregarTarefas();
       } catch (err) {
+        alert("Erro ao enviar resposta.");
         console.error(err);
-        alert('Erro ao carregar tarefas.');
       }
+    });
+
+    async function carregarTarefas() {
+      const res = await fetch("/api/tarefas", {
+        headers: { Authorization: "Bearer " + token }
+      });
+
+      const tarefas = await res.json();
+      const corpo = document.getElementById("corpoTarefas");
+      corpo.innerHTML = "";
+
+      tarefas.forEach(t => {
+        const linha = document.createElement("tr");
+        linha.innerHTML = `
+          <td>${t.id}</td>
+          <td>${t.titulo}</td>
+          <td>${t.descricao}</td>
+          <td>${t.status}</td>
+          <td>
+            ${t.observacao ? `<span class="bolinha" title="${t.observacao}"></span>` : ''}
+          </td>
+          <td>${t.nomeCriador || "Desconhecido"}</td>
+          <td>
+            ${t.status !== "concluido" ? `<button onclick="abrirModalResposta(${t.id})">Responder</button>` : "Concluída"}
+          </td>
+        `;
+        corpo.appendChild(linha);
+      });
     }
 
-    document.addEventListener('DOMContentLoaded', listarTarefas);
+    document.addEventListener("DOMContentLoaded", carregarTarefas);
   </script>
 </body>
 </html>
-

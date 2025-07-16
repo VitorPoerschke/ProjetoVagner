@@ -238,3 +238,53 @@ exports.excluirTarefaHistorico = (req, res) => {
     res.status(500).json({ erro: 'Erro interno ao excluir tarefa' });
   }
 };
+
+// Responder tarefa
+exports.responderTarefa = (req, res) => {
+  try {
+    const user = req.user;
+    const id = parseInt(req.params.id);
+    const mensagem = req.body.mensagem;
+    const anexo = req.file ? req.file.filename : null;
+
+    if (user.role !== 'responsavel') {
+      return res.status(403).json({ erro: 'Apenas responsáveis podem enviar respostas' });
+    }
+
+    const tarefa = tarefas.find(t => t.id === id);
+    if (!tarefa) {
+      return res.status(404).json({ erro: 'Tarefa não encontrada' });
+    }
+
+    tarefa.respostaMensagem = mensagem || '';
+    tarefa.respostaAnexo = anexo || '';
+    tarefa.status = 'em andamento'; // opcional: mudar status para "em andamento" após resposta
+
+    res.json({ mensagem: 'Resposta enviada com sucesso!' });
+  } catch (err) {
+    console.error('Erro ao responder tarefa:', err);
+    res.status(500).json({ erro: 'Erro interno ao responder tarefa' });
+  }
+};
+
+exports.devolverTarefa = (req, res) => {
+  const user = req.user;
+  const id = parseInt(req.params.id);
+  const { observacao } = req.body;
+
+  if (user.role !== 'master') {
+    return res.status(403).json({ erro: 'Apenas admins podem devolver tarefas' });
+  }
+
+  const tarefa = tarefas.find(t => t.id === id);
+  if (!tarefa) {
+    return res.status(404).json({ erro: 'Tarefa não encontrada' });
+  }
+
+  tarefa.respostaMensagem = '';
+  tarefa.respostaAnexo = '';
+  tarefa.status = 'em andamento';
+  tarefa.observacao = observacao;
+
+  res.json({ mensagem: 'Tarefa devolvida ao responsável com sucesso' });
+};

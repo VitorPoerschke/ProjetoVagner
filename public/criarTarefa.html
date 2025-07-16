@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Criar Tarefa - Cliente</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -19,8 +19,8 @@
       color: white;
     }
 
-    aside {
-      width: 220px;
+    .sidebar {
+      width: 240px;
       background-color: #141418;
       padding: 30px 20px;
       display: flex;
@@ -28,131 +28,156 @@
       justify-content: space-between;
     }
 
-    aside h1 {
-      font-size: 20px;
+    .logo {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 40px;
+      color: #facc15;
     }
 
-    aside nav a {
-      display: block;
-      padding: 12px 10px;
+    .menu a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
       color: white;
       text-decoration: none;
       font-weight: 500;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       border-radius: 6px;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.2s;
     }
 
-    aside nav a:hover {
+    .menu a:hover {
       background-color: #2e2e36;
+      transform: translateX(4px);
+    }
+
+    .btn-voltar {
+      background-color: #4f46e5;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn-voltar:hover {
+      background-color: #4338ca;
     }
 
     main {
       flex: 1;
-      padding: 40px;
+      padding: 50px;
     }
 
     h2 {
+      font-size: 26px;
       margin-bottom: 30px;
-      font-size: 24px;
     }
 
     form {
-      max-width: 500px;
+      max-width: 600px;
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
     input, textarea {
-      padding: 10px;
+      padding: 12px;
       border-radius: 6px;
       border: none;
       background-color: #2e2e36;
       color: white;
+      font-size: 15px;
     }
 
-    button {
-      background-color: #3c3f4a;
+    button[type="submit"] {
+      background-color: #4f46e5;
       color: white;
-      padding: 10px 16px;
+      padding: 12px 18px;
       border: none;
       border-radius: 6px;
+      font-weight: bold;
       cursor: pointer;
       width: fit-content;
+      transition: background-color 0.3s, transform 0.2s;
     }
 
-    button:hover {
-      background-color: #575b6d;
+    button[type="submit"]:hover {
+      background-color: #4338ca;
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
-  <aside>
+
+  <div class="sidebar">
     <div>
-      <h1>⚖️</h1>
-      <nav>
-        <a href="painel.html">Painel</a>
-        <a href="listarTarefas.html">Tarefas</a>
-        <a href="#">Clientes</a>
-      </nav>
+      <div class="logo">⚖️ Vagner Poerschke</div>
+      <div class="menu">
+        <a href="painel.html">📊 Painel</a>
+        <a href="#" id="linkTarefas">🗂️ Tarefas</a>
+      </div>
     </div>
-    <button onclick="logout()">Sair</button>
-  </aside>
+    <button class="btn-voltar" onclick="window.location.href='painel.html'">Voltar</button>
+  </div>
 
   <main>
-     <h2>Criar Tarefa (Cliente)</h2>
-    
+    <h2>Criar Tarefa</h2>
 
-  <form id="formCriarTarefa" enctype="multipart/form-data">
-    <input type="text" id="titulo" name="titulo" required placeholder="Título da tarefa">
-    <textarea id="descricao" name="descricao" required placeholder="Descrição da tarefa"></textarea>
-    <input type="file" id="anexo" name="anexo">
-    <button type="submit">Criar</button>
-  </form>
-</main>
+    <form id="formCriarTarefa" enctype="multipart/form-data">
+      <input type="text" id="titulo" name="titulo" required placeholder="Título da Tarefa" />
+      <textarea id="descricao" name="descricao" required placeholder="Descrição detalhada" rows="5"></textarea>
+      <input type="file" id="anexo" name="anexo">
+      <button type="submit">Criar</button>
+    </form>
+  </main>
 
-<script>
-  const token = localStorage.getItem('token');
+  <script>
+    const token = localStorage.getItem('token');
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const role = payload.role;
 
-  const payload = JSON.parse(atob(token.split('.')[1]));
+    // Redireciona corretamente
+    document.getElementById('linkTarefas').addEventListener('click', () => {
+      if (role === 'responsavel') {
+        window.location.href = 'painelResponsavel.html';
+      } else {
+        window.location.href = 'listarTarefas.html';
+      }
+    });
 
-  if (payload.role !== 'cliente') {
-    alert('Apenas clientes podem criar tarefas.');
-    window.location.href = 'painel.html';
-  }
+    document.getElementById('formCriarTarefa').addEventListener('submit', async function (e) {
+      e.preventDefault();
 
-  document.getElementById('formCriarTarefa').addEventListener('submit', async function (e) {
-    e.preventDefault();
+      try {
+        const form = document.getElementById('formCriarTarefa');
+        const formData = new FormData(form);
 
-    try {
-      const form = document.getElementById('formCriarTarefa');
-      const formData = new FormData(form);
+        const res = await fetch('/api/tarefas', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          },
+          body: formData
+        });
 
-      const res = await fetch('/api/tarefas', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + token
-        },
-        body: formData
-      });
+        if (!res.ok) throw new Error('Erro ao criar tarefa');
 
-      if (!res.ok) throw new Error('Erro ao criar tarefa');
-
-      alert('Tarefa criada com sucesso!');
-      window.location.href = 'listarTarefas.html';
-    } catch (err) {
-      console.error('Erro ao enviar tarefa:', err);
-      alert('Erro ao criar tarefa. Verifique os dados.');
-    }
-  });
-
-  function logout() {
-    localStorage.removeItem('token');
-    window.location.href = 'index.html';
-  }
-</script>
+        alert('Tarefa criada com sucesso!');
+        window.location.href = 'listarTarefas.html';
+      } catch (err) {
+        console.error('Erro ao enviar tarefa:', err);
+        alert('Erro ao criar tarefa. Verifique os dados.');
+      }
+    });
+  </script>
 
 </body>
 </html>

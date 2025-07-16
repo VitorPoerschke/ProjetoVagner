@@ -2,111 +2,141 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Painel</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+  <title>Painel - Master</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 0;
+      font-family: 'Inter', sans-serif;
     }
 
     body {
       display: flex;
       height: 100vh;
       background-color: #1e1e24;
-      color: white;
+      color: #fff;
     }
 
     aside {
-      width: 220px;
+      width: 240px;
       background-color: #141418;
       padding: 30px 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      transition: background-color 0.3s;
     }
 
-    aside h1 {
-      font-size: 20px;
+    .logo {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 40px;
+      color: #facc15;
+    }
+
+    .logo span {
+      font-size: 14px;
+      color: #aaa;
     }
 
     aside nav a {
-      display: block;
-      padding: 12px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
       color: white;
       text-decoration: none;
       font-weight: 500;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       border-radius: 6px;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.2s;
     }
 
     aside nav a:hover {
       background-color: #2e2e36;
+      transform: translateX(4px);
     }
 
-    main {
-      flex: 1;
-      padding: 40px;
+    .icon {
+      width: 18px;
     }
 
-    h2 {
-      margin-bottom: 30px;
-      font-size: 24px;
-    }
-
-    .btn {
+    .btn-voltar {
       background-color: #3c3f4a;
       color: white;
       padding: 10px 16px;
       border: none;
       border-radius: 6px;
-      margin-right: 10px;
       cursor: pointer;
-      transition: background 0.2s;
-      margin-bottom: 10px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    .btn-voltar:hover {
+      background-color: #575b6d;
+    }
+
+    main {
+      flex: 1;
+      padding: 50px;
+      background-color: #1e1e24;
+    }
+
+    main h2 {
+      font-size: 26px;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      background-color: #4f46e5;
+      color: white;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 6px;
+      margin-right: 15px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.3s, transform 0.2s;
     }
 
     .btn:hover {
-      background-color: #575b6d;
+      background-color: #4338ca;
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
+
   <aside>
     <div>
-      <h1>⚖️</h1>
+      <div class="logo">⚖️ Vagner Poerschke</div>
       <nav>
-        <a href="painel.html">Painel</a>
-        <a href="listarTarefas.html">Tarefas</a>
-        <a href="#">Clientes</a>
+        <a href="painel.html"><span class="icon">📊</span> Painel</a>
+        <a href="#" id="linkTarefas"><span class="icon">🗂️</span> Tarefas</a>
+        <a href="revisarRespostas.html"><span class="icon">📩</span> Revisar Respostas</a>
+        <a href="#"><span class="icon">👥</span> Clientes</a>
       </nav>
     </div>
-    <button class="btn" onclick="logout()">Sair</button>
+    <button class="btn-voltar" onclick="logout()">Sair</button>
   </aside>
 
   <main>
     <h2 id="userRole">Bem-vindo, ...</h2>
     <button class="btn" onclick="irParaCriarTarefa()">Criar Tarefa</button>
-    <button id="btnAtribuir" class="btn" onclick="window.location.href='atribuirResponsavel.html'">Atribuir Responsável</button>
-    <button id="btnStatus" class="btn" onclick="window.location.href='alterarStatus.html'">Alterar Status</button>
-    <button id="btnHistorico" class="btn" onclick="window.location.href='verHistorico.html'">Ver Histórico</button>
+    <button class="btn" onclick="window.location.href='verHistorico.html'">Ver Histórico</button>
   </main>
 
   <script>
     const token = localStorage.getItem('token');
     const payload = JSON.parse(atob(token.split('.')[1]));
     const role = payload.role;
-    document.getElementById('userRole').innerText = `Bem-vindo, ${role}`;
 
-    if (role === 'cliente') {
-      document.getElementById('btnAtribuir').style.display = 'none';
-      document.getElementById('btnStatus').style.display = 'none';
-      document.getElementById('btnHistorico').style.display = 'none';
-    }
+    document.getElementById('userRole').innerText = `Bem-vindo, ${role}`;
 
     function logout() {
       localStorage.removeItem('token');
@@ -120,6 +150,15 @@
         window.location.href = 'criarTarefa.html';
       }
     }
+
+    document.getElementById('linkTarefas').addEventListener('click', () => {
+  if (role === 'responsavel') {
+    window.location.href = 'painelResponsavel.html';
+  } else {
+    window.location.href = 'listarTarefas.html';
+  }
+});
   </script>
+
 </body>
 </html>

@@ -12,6 +12,8 @@ router.put('/:id', autenticarToken, tarefaController.atualizarTarefa);
 router.delete('/:id', autenticarToken, tarefaController.deletarTarefa);
 router.put('/:id/atribuir', autenticarToken, tarefaController.atribuirResponsavel);
 router.put('/:id/status', autenticarToken, tarefaController.atualizarStatus);
+router.put('/:id/responder', autenticarToken, upload.single('anexo'), tarefaController.responderTarefa);
+router.put('/:id/devolver', autenticarToken, tarefaController.devolverTarefa);
 
 // ROTAS DE HISTÓRICO (tem que vir ANTES do router.get('/:id'))
 router.get('/historico/concluidas', autenticarToken, tarefaController.historicoConcluidas);

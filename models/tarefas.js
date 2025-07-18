@@ -1,5 +1,3 @@
-// models/tarefas.js
-
 const tarefas = [
   {
     id: 1,
@@ -7,7 +5,7 @@ const tarefas = [
     descricao: 'Tarefa criada por cliente',
     status: 'pendente',
     responsavel: '',
-    usuarioId: 2, // ID do cliente
+    usuarioId: 2,
     respostaMensagem: '',
     respostaAnexo: ''
   },
@@ -17,10 +15,15 @@ const tarefas = [
     descricao: 'Tarefa criada por master',
     status: 'concluido',
     responsavel: 'advogado1',
-    usuarioId: 1, // ID do master
+    usuarioId: 1,
     respostaMensagem: '',
     respostaAnexo: ''
   }
 ];
 
-module.exports = tarefas;
+const historicoTarefas = [];
+
+module.exports = {
+  tarefas,
+  historicoTarefas
+};

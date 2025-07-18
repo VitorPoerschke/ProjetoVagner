@@ -1,6 +1,5 @@
-const tarefas = require('../models/tarefas');
+const { tarefas, historicoTarefas } = require('../models/tarefas');
 const usuarios = require('../models/usuarios');
-const historicoTarefas = [];
 
 
 exports.listarTarefas = (req, res) => {

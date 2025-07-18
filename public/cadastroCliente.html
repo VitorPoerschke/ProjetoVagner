@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cadastro de Cliente</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #2e2e48, #1e1e2f);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: #1e1e2f;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+      width: 100%;
+      max-width: 1000px;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    h1 {
+      color: #facc15;
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 24px;
+      text-shadow: 0 0 8px #facc15aa;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .form-group {
+      flex: 1 1 45%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      color: #ccc;
+      margin-bottom: 6px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    input {
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background-color: #1a1a2d;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    input::placeholder {
+      color: #888;
+    }
+
+    .btn {
+      flex: 1 1 100%;
+      padding: 12px;
+      background: linear-gradient(to right, #4f46e5, #7c3aed);
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      margin-top: 10px;
+    }
+
+    .btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 12px #7c3aed;
+    }
+
+    .msg-sucesso {
+      display: none;
+      text-align: center;
+      color: #22c55e;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    .voltar {
+      margin-top: 16px;
+      text-align: center;
+      color: #93c5fd;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+
+    .voltar:hover {
+      color: #60a5fa;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .form-group {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚖️ Cadastro de Cliente</h1>
+    <form id="formularioCliente">
+      <div class="form-group">
+        <label for="nome">Nome Completo</label>
+        <input type="text" id="nome" placeholder="Ex: Maria Silva" />
+      </div>
+
+      <div class="form-group">
+        <label for="cpfcnpj">CPF/CNPJ</label>
+        <input type="text" id="cpfcnpj" placeholder="123.456.789-00 ou 00.000.000/0001-00" />
+      </div>
+
+      <div class="form-group">
+        <label for="endereco">Endereço</label>
+        <input type="text" id="endereco" placeholder="Rua X, nº 123, Bairro Y" />
+      </div>
+
+      <div class="form-group">
+        <label for="telefone1">Telefone 01</label>
+        <input type="text" id="telefone1" placeholder="(99) 99999-9999" />
+      </div>
+
+      <div class="form-group">
+        <label for="telefone2">Telefone 02</label>
+        <input type="text" id="telefone2" placeholder="(99) 99999-9999 (opcional)" />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="cliente@email.com" />
+      </div>
+
+      <div class="form-group">
+        <label for="pispasep">PIS/PASEP</label>
+        <input type="text" id="pispasep" placeholder="123.45678.90-1" />
+      </div>
+
+      <div class="form-group">
+        <label for="processos">Processos Vinculados</label>
+        <input type="number" id="processos" placeholder="Ex: 3" min="0" />
+      </div>
+
+      <button type="button" class="btn" onclick="cadastrarCliente()">Cadastrar Cliente</button>
+      <button type="button" class="btn" onclick="voltarLogin()">Voltar ao login</button>
+    </form>
+
+    <div class="msg-sucesso" id="mensagemSucesso">🎉 Cliente cadastrado com sucesso!</div>
+  </div>
+
+  <script>
+    function cadastrarCliente() {
+      const nome = document.getElementById('nome').value;
+      const cpfcnpj = document.getElementById('cpfcnpj').value;
+      const endereco = document.getElementById('endereco').value;
+      const telefone1 = document.getElementById('telefone1').value;
+      const telefone2 = document.getElementById('telefone2').value;
+      const email = document.getElementById('email').value;
+      const pispasep = document.getElementById('pispasep').value;
+      const processos = document.getElementById('processos').value;
+
+      if (!nome || !cpfcnpj || !endereco || !telefone1 || !email || !pispasep || processos === "") {
+        alert("Por favor, preencha todos os campos obrigatórios.");
+        return;
+      }
+
+      document.getElementById('mensagemSucesso').style.display = 'block';
+      console.log("Dados do cliente:", {
+        nome, cpfcnpj, endereco, telefone1, telefone2, email, pispasep, processos
+      });
+    }
+
+    function voltarLogin() {
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>

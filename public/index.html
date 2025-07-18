@@ -3,41 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <title>Login - Vagner Poerschke Advocacia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Inter', sans-serif;
     }
 
     body {
-      background-color: #1e1e2f;
       height: 100vh;
+      background: radial-gradient(circle at top, #1e1e2f, #0e0e17);
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      overflow: hidden;
     }
 
     .login-container {
-      background-color: #262636;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
       padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-      width: 100%;
-      max-width: 400px;
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.05);
       text-align: center;
+      position: relative;
+      z-index: 2;
+      max-width: 420px;
+      width: 100%;
+      animation: fadeIn 1s ease-out;
     }
 
-    .logo {
-      width: 140px;
-      margin-bottom: 20px;
+    .login-container h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: #facc15;
+      font-size: 24px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 8px #facc15aa;
     }
 
     h2 {
-      color: #ffffff;
+      color: #fff;
+      font-size: 20px;
       margin-bottom: 25px;
-      font-size: 24px;
     }
 
     input {
@@ -58,33 +68,113 @@
     button {
       width: 100%;
       padding: 12px;
-      background-color: #4f46e5;
-      color: white;
       font-size: 16px;
       font-weight: bold;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s;
+      margin-top: 10px;
+      transition: transform 0.3s, box-shadow 0.3s;
     }
 
     button:hover {
-      background-color: #4338ca;
+      transform: scale(1.03);
     }
 
-    .error {
-      color: #ff6b6b;
-      font-size: 14px;
-      margin-bottom: 10px;
+    .login-btn {
+      background: linear-gradient(to right, #4f46e5, #7c3aed);
+      color: white;
+    }
+
+    .login-btn:hover {
+      box-shadow: 0 0 10px #7c3aed;
+    }
+
+    .cadastro-btn {
+      background: none;
+      border: 2px solid #4f46e5;
+      color: #4f46e5;
+    }
+
+    .cadastro-btn:hover {
+      background-color: #4f46e5;
+      color: white;
+      box-shadow: 0 0 10px #4f46e5;
+    }
+
+    .glow {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #6366f1, transparent 70%);
+      filter: blur(100px);
+      z-index: 1;
+      animation: float 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      0% { transform: translate(-30px, -20px); }
+      100% { transform: translate(30px, 20px); }
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-success {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle, #4f46e5, #1e1e24);
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 32px;
+      letter-spacing: 2px;
+      animation: epic-entry 1.5s ease-out forwards;
+    }
+
+    @keyframes epic-entry {
+      0% {
+        opacity: 0;
+        transform: scale(1.5) rotate(15deg);
+        filter: blur(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+        filter: blur(0);
+      }
     }
   </style>
 </head>
 <body>
+
+  <div class="glow"></div>
+
   <div class="login-container">
+    <h1>⚖️ Vagner Poerschke</h1>
     <h2>Login</h2>
     <input type="text" id="email" placeholder="Email">
     <input type="password" id="senha" placeholder="Senha">
-    <button onclick="logar()">Entrar</button>
+    <button class="login-btn" onclick="logar()">Entrar</button>
+    <button class="cadastro-btn" onclick="abrirCadastro()">Cadastrar-se</button>
+  </div>
+
+  <div id="loginSuccess" class="login-success" style="display: none;">
+    Acesso Liberado ⚡
   </div>
 
   <script>
@@ -107,8 +197,19 @@
         const data = await res.json();
 
         if (res.ok && data.token) {
-          localStorage.setItem('token', data.token);
-          window.location.href = 'painel.html';
+          document.getElementById('loginSuccess').style.display = 'flex';
+
+          setTimeout(() => {
+            localStorage.setItem('token', data.token);
+            const payload = JSON.parse(atob(data.token.split('.')[1]));
+            if (payload.role === 'master') {
+              window.location.href = 'painel.html';
+            } else if (payload.role === 'cliente') {
+              window.location.href = 'criarTarefa.html';
+            } else {
+              window.location.href = 'painel.html';
+            }
+          }, 1500);
         } else {
           alert('Login inválido!');
         }
@@ -116,6 +217,10 @@
         alert('Erro de conexão com o servidor');
         console.error('Erro no login:', error);
       }
+    }
+
+    function abrirCadastro() {
+      window.location.href = 'cadastroCliente.html';
     }
   </script>
 </body>

@@ -118,8 +118,8 @@
       <nav>
         <a href="painel.html"><span class="icon">📊</span> Painel</a>
         <a href="#" id="linkTarefas"><span class="icon">🗂️</span> Tarefas</a>
-        <a href="revisarRespostas.html"><span class="icon">📩</span> Revisar Respostas</a>
-        <a href="#"><span class="icon">👥</span> Clientes</a>
+        <a href="revisarRespostas.html" id ="RevisarRespostas"><span class="icon">📩</span> Revisar Respostas</a>
+        <a href="clientes.html" id="linkClientes"><span class="icon">👥</span> Clientes</a>
       </nav>
     </div>
     <button class="btn-voltar" onclick="logout()">Sair</button>
@@ -138,6 +138,31 @@
 
     document.getElementById('userRole').innerText = `Bem-vindo, ${role}`;
 
+    // Redirecionamento para tarefas correto por role
+    document.getElementById('linkTarefas').addEventListener('click', () => {
+      if (role === 'responsavel') {
+        window.location.href = 'painelResponsavel.html';
+      } else {
+        window.location.href = 'listarTarefas.html';
+      }
+    });
+
+    // Ocultar botão "Clientes" se não for master
+    if (role !== 'master') {
+      const linkClientes = document.getElementById('linkClientes');
+      if (linkClientes) {
+        linkClientes.style.display = 'none';
+      }
+    }
+
+    // Ocultar botão "Revisar Respostas" se não for master
+    if (role !== 'master') {
+      const RevisarRespostas = document.getElementById('RevisarRespostas');
+      if (RevisarRespostas) {
+        RevisarRespostas.style.display = 'none';
+      }
+    }
+
     function logout() {
       localStorage.removeItem('token');
       window.location.href = 'index.html';
@@ -150,14 +175,6 @@
         window.location.href = 'criarTarefa.html';
       }
     }
-
-    document.getElementById('linkTarefas').addEventListener('click', () => {
-  if (role === 'responsavel') {
-    window.location.href = 'painelResponsavel.html';
-  } else {
-    window.location.href = 'listarTarefas.html';
-  }
-});
   </script>
 
 </body>

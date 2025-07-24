@@ -4,10 +4,14 @@ require('dotenv').config();
 const path = require('path');
 const limparHistoricoAntigo = require('./utils/limparHistorico');
 
+
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+
 
 // ✅ Expor a pasta uploads publicamente
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -16,11 +20,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const authRoutes = require('./routes/auth');
 const tarefaRoutes = require('./routes/tarefas');
 const usuarioRoutes = require('./routes/usuarios');
+const rotaClientes = require('./routes/clientes');
 
 // Usar Rotas
 app.use('/api/auth', authRoutes);
 app.use('/api/tarefas', tarefaRoutes);
 app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/clientes', rotaClientes);
 
 // Servir o frontend (public/index.html)
 app.use(express.static(path.join(__dirname, 'public')));

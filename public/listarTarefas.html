@@ -153,11 +153,11 @@
   <div class="sidebar">
     <div>
       <div class="logo">⚖️ Vagner Poerschke</div>
-      <div class="menu">
+        <div class="menu">
         <a href="painel.html">📊 Painel</a>
         <a href="listarTarefas.html">🗂️ Tarefas</a>
-        <a href="revisarRespostas.html">📩 Revisar Respostas</a>
-        <a href="#">👥 Clientes</a>
+        <a href="revisarRespostas.html" id="linkRevisar">📩 Revisar Respostas</a>
+        <a href="#" id="linkClientes">👥 Clientes</a>
       </div>
     </div>
     <button class="btn-voltar" onclick="window.location.href='painel.html'">Voltar</button>
@@ -349,6 +349,18 @@
     }
 
     document.addEventListener('DOMContentLoaded', listarTarefas);
+
+    // Proteção de acesso visual no menu
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const role = payload.role;
+
+      if (role !== 'master') {
+        const revisar = document.getElementById('linkRevisar');
+        const clientes = document.getElementById('linkClientes');
+
+        if (revisar) revisar.style.display = 'none';
+        if (clientes) clientes.style.display = 'none';
+      }
   </script>
 </body>
 </html>

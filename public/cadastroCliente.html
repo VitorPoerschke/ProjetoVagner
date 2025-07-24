@@ -173,6 +173,9 @@
         <input type="number" id="processos" placeholder="Ex: 3" min="0" />
       </div>
 
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" placeholder="Digite uma senha segura">
+
       <button type="button" class="btn" onclick="cadastrarCliente()">Cadastrar Cliente</button>
       <button type="button" class="btn" onclick="voltarLogin()">Voltar ao login</button>
     </form>
@@ -181,30 +184,59 @@
   </div>
 
   <script>
-    function cadastrarCliente() {
-      const nome = document.getElementById('nome').value;
-      const cpfcnpj = document.getElementById('cpfcnpj').value;
-      const endereco = document.getElementById('endereco').value;
-      const telefone1 = document.getElementById('telefone1').value;
-      const telefone2 = document.getElementById('telefone2').value;
-      const email = document.getElementById('email').value;
-      const pispasep = document.getElementById('pispasep').value;
-      const processos = document.getElementById('processos').value;
+  async function cadastrarCliente() {
+    const nome = document.getElementById('nome').value;
+    const cpfCnpj = document.getElementById('cpfcnpj').value;
+    const endereco = document.getElementById('endereco').value;
+    const telefone1 = document.getElementById('telefone1').value;
+    const telefone2 = document.getElementById('telefone2').value;
+    const email = document.getElementById('email').value;
+    const pisPasep = document.getElementById('pispasep').value;
+    const processos = document.getElementById('processos').value;
+    const senha = document.getElementById('senha').value;
 
-      if (!nome || !cpfcnpj || !endereco || !telefone1 || !email || !pispasep || processos === "") {
-        alert("Por favor, preencha todos os campos obrigatórios.");
-        return;
-      }
+    if (!nome || !cpfCnpj || !senha || !endereco || !telefone1 || !email || !pispasep || processos === "") {
+      alert("Preencha todos os campos obrigatórios.");
+      return;
+    }
 
-      document.getElementById('mensagemSucesso').style.display = 'block';
-      console.log("Dados do cliente:", {
-        nome, cpfcnpj, endereco, telefone1, telefone2, email, pispasep, processos
+    const dados = {
+      nome,
+      cpfCnpj,
+      endereco,
+      telefone1,
+      telefone2,
+      email,
+      pisPasep,
+      processosVinculados: processos,
+      senha
+    };
+
+    try {
+      const res = await fetch('/api/clientes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
       });
-    }
 
-    function voltarLogin() {
-      window.location.href = "index.html";
+      const resposta = await res.json();
+
+      if (res.ok) {
+        document.getElementById('mensagemSucesso').style.display = 'block';
+        console.log("Cliente cadastrado:", resposta.cliente);
+      } else {
+        alert(resposta.erro || 'Erro ao cadastrar cliente.');
+      }
+    } catch (err) {
+      console.error('Erro na requisição:', err);
+      alert('Erro de conexão com o servidor.');
     }
-  </script>
+  }
+
+  function voltarLogin() {
+    window.location.href = "index.html";
+  }
+</script>
+
 </body>
 </html>

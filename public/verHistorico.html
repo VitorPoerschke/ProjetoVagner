@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <title>Histórico de Tarefas</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 0;
+      font-family: 'Inter', sans-serif;
     }
 
     body {
       display: flex;
       height: 100vh;
       background-color: #1e1e24;
-      color: white;
+      color: #fff;
     }
 
     aside {
-      width: 220px;
+      width: 240px;
       background-color: #141418;
       padding: 30px 20px;
       display: flex;
@@ -28,34 +28,70 @@
       justify-content: space-between;
     }
 
-    aside h1 {
-      font-size: 20px;
+    .logo {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 40px;
+      color: #facc15;
     }
 
-    aside nav a {
-      display: block;
-      padding: 12px 10px;
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
       color: white;
       text-decoration: none;
       font-weight: 500;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       border-radius: 6px;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.2s;
     }
 
-    aside nav a:hover {
+    nav a:hover {
       background-color: #2e2e36;
+      transform: translateX(4px);
+    }
+
+    .icon {
+      width: 18px;
+    }
+
+    .btn-voltar {
+      background-color: #3c3f4a;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    .btn-voltar:hover {
+      background-color: #575b6d;
     }
 
     main {
       flex: 1;
-      padding: 40px;
+      padding: 50px;
+      background-color: #1e1e24;
     }
 
-    h2 {
+    main h2 {
+      font-size: 26px;
       margin-bottom: 20px;
-      font-size: 24px;
+    }
+
+    .alerta {
+      background-color: #ffcc00;
+      color: #000;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 20px;
     }
 
     table {
@@ -80,39 +116,46 @@
       background-color: #383a45;
     }
 
-    .btn-voltar {
-      margin-top: 20px;
-      padding: 10px 16px;
+    .acao-btn {
+      margin-top: 4px;
+      padding: 6px 12px;
       border: none;
-      background-color: #4f46e5;
-      color: white;
-      border-radius: 6px;
+      border-radius: 4px;
+      font-size: 13px;
       cursor: pointer;
     }
 
-    .btn-voltar:hover {
-      background-color: #4338ca;
+    .restaurar {
+      background-color: #4f46e5;
+      color: white;
+    }
+
+    .excluir {
+      background-color: crimson;
+      color: white;
+    }
+
+    .acao-btn:hover {
+      opacity: 0.9;
     }
   </style>
 </head>
 <body>
   <aside>
     <div>
-      <h1>⚖️</h1>
+      <div class="logo">⚖️ Vagner Poerschke 🏛️ Advocacia</div>
       <nav>
-        <a href="painel.html">Painel</a>
-        <a href="listarTarefas.html">Tarefas</a>
-        <a href="#">Clientes</a>
+        <a href="painel.html"><span class="icon">📊</span> Painel</a>
+        <a href="listarTarefas.html"><span class="icon">🗂️</span> Tarefas</a>
+        <a href="clientes.html"><span class="icon">👥</span> Clientes</a>
       </nav>
     </div>
     <button class="btn-voltar" onclick="logout()">Sair</button>
   </aside>
 
   <main>
-    <h2>Histórico de Tarefas Concluídas</h2>
-    <div style="background-color: #ffcc00; color: #000; padding: 10px; border-radius: 6px; margin-bottom: 20px;">
-      ⚠️ As tarefas concluídas são removidas automaticamente após 30 dias.
-    </div>
+    <h2>📁 Histórico de Tarefas Concluídas</h2>
+    <div class="alerta">⚠️ As tarefas concluídas são removidas automaticamente após 30 dias.</div>
     <table>
       <thead>
         <tr>
@@ -123,109 +166,100 @@
           <th>Status</th>
         </tr>
       </thead>
-      <tbody id="corpoHistorico">
-        <!-- Preenchido via JS -->
-      </tbody>
+      <tbody id="corpoHistorico"></tbody>
     </table>
-
-    <button class="btn-voltar" onclick="window.location.href='painel.html'">Voltar</button>
   </main>
+
   <script>
-  const token = localStorage.getItem('token');
-  const payload = JSON.parse(atob(token.split('.')[1]));
-  const role = payload.role;
+    const token = localStorage.getItem('token');
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const role = payload.role;
 
-  function logout() {
-    localStorage.removeItem('token');
-    window.location.href = 'index.html';
-  }
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    }
 
-  async function carregarHistorico() {
-    try {
-      const res = await fetch('/api/tarefas/historico/concluidas', {
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
+    async function carregarHistorico() {
+      try {
+        const res = await fetch('/api/tarefas/historico/concluidas', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
 
-      if (!res.ok) throw new Error('Falha ao buscar histórico');
+        if (!res.ok) throw new Error('Falha ao buscar histórico');
 
-      const tarefas = await res.json();
-      const corpo = document.getElementById('corpoHistorico');
-      corpo.innerHTML = '';
+        const tarefas = await res.json();
+        const corpo = document.getElementById('corpoHistorico');
+        corpo.innerHTML = '';
 
-      if (tarefas.length === 0) {
-        corpo.innerHTML = '<tr><td colspan="5">Nenhuma tarefa concluída.</td></tr>';
-        return;
+        if (tarefas.length === 0) {
+          corpo.innerHTML = '<tr><td colspan="5">Nenhuma tarefa concluída.</td></tr>';
+          return;
+        }
+
+        tarefas.forEach(t => {
+          const linha = document.createElement('tr');
+          linha.innerHTML = `
+            <td>${t.id}</td>
+            <td>${t.titulo}</td>
+            <td>${t.nomeCriador || 'Desconhecido'}</td>
+            <td>${t.responsavelNome || '-'}</td>
+            <td>
+              ${t.status}
+              ${role === 'master' ? `
+                <br>
+                <button class="acao-btn restaurar" onclick="restaurarTarefa(${t.id})">Restaurar</button>
+                <button class="acao-btn excluir" onclick="excluirTarefa(${t.id})">Excluir</button>
+              ` : ''}
+            </td>
+          `;
+          corpo.appendChild(linha);
+        });
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao carregar histórico.');
       }
-
-      tarefas.forEach(t => {
-        const linha = document.createElement('tr');
-        linha.innerHTML = `
-          <td>${t.id}</td>
-          <td>${t.titulo}</td>
-          <td>${t.nomeCriador || 'Desconhecido'}</td>
-          <td>${t.responsavelNome || '-'}</td>
-          <td>
-            ${t.status}
-            ${role === 'master' ? `
-              <br>
-              <button onclick="restaurarTarefa(${t.id})" style="margin-top:4px;">Restaurar</button>
-              <button onclick="excluirTarefa(${t.id})" style="margin-top:4px; background-color: crimson; color: white;">Excluir</button>
-            ` : ''}
-          </td>
-        `;
-        corpo.appendChild(linha);
-      });
-
-    } catch (err) {
-      console.error(err);
-      alert('Erro ao carregar histórico.');
     }
-  }
 
-  async function restaurarTarefa(id) {
-    try {
-      const res = await fetch(`/api/tarefas/historico/${id}/restaurar`, {
-        method: 'PUT',
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
+    async function restaurarTarefa(id) {
+      try {
+        const res = await fetch(`/api/tarefas/historico/${id}/restaurar`, {
+          method: 'PUT',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
 
-      const data = await res.json();
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.erro || 'Erro ao restaurar');
 
-      if (!res.ok) throw new Error(data.erro || 'Erro ao restaurar');
-
-      alert(data.mensagem);
-      carregarHistorico();
-
-    } catch (err) {
-      console.error(err);
-      alert('Erro ao restaurar tarefa.');
+        alert(data.mensagem);
+        carregarHistorico();
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao restaurar tarefa.');
+      }
     }
-  }
 
-  async function excluirTarefa(id) {
-    if (!confirm('Tem certeza que deseja excluir permanentemente?')) return;
+    async function excluirTarefa(id) {
+      if (!confirm('Tem certeza que deseja excluir permanentemente?')) return;
 
-    try {
-      const res = await fetch(`/api/tarefas/historico/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
+      try {
+        const res = await fetch(`/api/tarefas/historico/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
 
-      const data = await res.json();
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.erro || 'Erro ao excluir');
 
-      if (!res.ok) throw new Error(data.erro || 'Erro ao excluir');
-
-      alert(data.mensagem);
-      carregarHistorico();
-
-    } catch (err) {
-      console.error(err);
-      alert('Erro ao excluir tarefa.');
+        alert(data.mensagem);
+        carregarHistorico();
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao excluir tarefa.');
+      }
     }
-  }
 
-  document.addEventListener('DOMContentLoaded', carregarHistorico);
-</script>
-
+    document.addEventListener('DOMContentLoaded', carregarHistorico);
+  </script>
 </body>
 </html>

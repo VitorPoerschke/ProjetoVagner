@@ -114,7 +114,7 @@
 
   <aside>
     <div>
-      <div class="logo">⚖️ Vagner Poerschke</div>
+      <div class="logo">⚖️ Vagner Poerschke  🏛️ Advocacia</div>
       <nav>
         <a href="painel.html"><span class="icon">📊</span> Painel</a>
         <a href="#" id="linkTarefas"><span class="icon">🗂️</span> Tarefas</a>
@@ -128,7 +128,7 @@
   <main>
     <h2 id="userRole">Bem-vindo, ...</h2>
     <button class="btn" onclick="irParaCriarTarefa()">Criar Tarefa</button>
-    <button class="btn" onclick="window.location.href='verHistorico.html'">Ver Histórico</button>
+    <button id="btnHistorico" class="btn" onclick="window.location.href='verHistorico.html'">Ver Histórico</button>
   </main>
 
   <script>
@@ -138,6 +138,12 @@
 
     document.getElementById('userRole').innerText = `Bem-vindo, ${role}`;
 
+    if (role !== 'master') {
+    const botaoHistorico = document.getElementById('btnHistorico');
+    if (botaoHistorico) {
+    botaoHistorico.style.display = 'none';
+      }
+    }
     // Redirecionamento para tarefas correto por role
     document.getElementById('linkTarefas').addEventListener('click', () => {
       if (role === 'responsavel') {

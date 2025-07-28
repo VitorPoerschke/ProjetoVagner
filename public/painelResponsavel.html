@@ -173,7 +173,7 @@
 
   <div class="sidebar">
     <div>
-      <div class="logo">⚖️ Vagner Poerschke</div>
+      <div class="logo">⚖️ Vagner Poerschke 🏛️ Advocacia</div>
       <div class="menu">
         <a href="painelResponsavel.html">📂 Minhas Tarefas</a>
       </div>
@@ -191,6 +191,7 @@
           <th>Descrição</th>
           <th>Status</th>
           <th>Observação</th>
+          <th>Anexo</th> <!-- NOVA COLUNA -->
           <th>Criador</th>
           <th>Ações</th>
         </tr>
@@ -280,6 +281,9 @@
           <td>${t.status}</td>
           <td>
             ${t.observacao ? `<span class="bolinha" title="${t.observacao}"></span>` : ''}
+          </td>
+          <td>
+          ${t.anexo ? `<a href="/uploads/${t.anexo}" target="_blank">${t.anexo}</a>` : 'Nenhum'}
           </td>
           <td>${t.nomeCriador || "Desconhecido"}</td>
           <td>

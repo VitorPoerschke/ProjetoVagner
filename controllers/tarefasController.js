@@ -287,3 +287,11 @@ exports.devolverTarefa = (req, res) => {
 
   res.json({ mensagem: 'Tarefa devolvida ao responsável com sucesso' });
 };
+
+
+const { obterEspacoUsado, MAX_BYTES } = require('../utils/storageUtils');
+
+exports.verificarEspaco = (req, res) => {
+  const uso = obterEspacoUsado();
+  res.json({ uso, maximo: MAX_BYTES });
+};

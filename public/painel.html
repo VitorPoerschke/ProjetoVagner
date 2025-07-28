@@ -181,6 +181,27 @@
         window.location.href = 'criarTarefa.html';
       }
     }
+
+    async function verificarEspacoDisco() {
+  const res = await fetch('/api/tarefas/espaco', {
+    headers: {
+      Authorization: 'Bearer ' + token
+    }
+  });
+  if (!res.ok) return;
+
+  const { uso, maximo } = await res.json();
+  const usoPorcentagem = (uso / maximo) * 100;
+
+  if (usoPorcentagem >= 90) {
+    alert(`⚠️ Aviso: uso de armazenamento em ${usoPorcentagem.toFixed(2)}%. Considere fazer backup ou limpar o histórico.`);
+  }
+}
+
+if (role === 'master') {
+  verificarEspacoDisco();
+}
+
   </script>
 
 </body>

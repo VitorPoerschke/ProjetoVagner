@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const usuarioController = require('../controllers/usuarioController');
 const autenticarToken = require('../middleware/auth');
-const usuarios = require('../models/usuarios');
+const { usuarios } = require('../models/usuarios');
 
 // Proteger todas as rotas de usuários
 router.use(autenticarToken);

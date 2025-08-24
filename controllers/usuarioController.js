@@ -1,4 +1,4 @@
-const usuarios = require('../models/usuarios');
+const { usuarios } = require('../models/usuarios');
 const bcrypt = require('bcryptjs');
 
 // Listar todos os usuários

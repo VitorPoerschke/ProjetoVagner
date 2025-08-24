@@ -1,5 +1,5 @@
 const clientes = require('../models/clientes');
-const usuarios = require('../models/usuarios'); // importa usuários
+const { usuarios } = require('../models/usuarios');
 const bcrypt = require('bcryptjs');
 
 function validarEmail(email) {

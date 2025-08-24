@@ -1,5 +1,5 @@
 const { tarefas, historicoTarefas } = require('../models/tarefas');
-const usuarios = require('../models/usuarios');
+const { usuarios } = require('../models/usuarios');
 
 
 exports.listarTarefas = (req, res) => {
@@ -66,7 +66,8 @@ exports.criarTarefa = (req, res) => {
 
   if (!titulo || !descricao) return res.status(400).json({ erro: 'Campos obrigatórios' });
 
-  const anexo = req.file ? req.file.filename : null;
+  // pega todos os arquivos enviados
+  const anexos = req.files ? req.files.map(f => f.filename) : [];
 
   const novaTarefa = {
     id: tarefas.length + 1,
@@ -75,12 +76,13 @@ exports.criarTarefa = (req, res) => {
     status: 'pendente',
     responsavel: '',
     usuarioId: req.user.id,
-    anexo
+    anexos // salva como array!
   };
 
   tarefas.push(novaTarefa);
   res.status(201).json(novaTarefa);
 };
+
 
 // Atualizar tarefa
 exports.atualizarTarefa = (req, res) => {

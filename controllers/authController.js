@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const usuarios = require('../models/usuarios');
+const { usuarios } = require('../models/usuarios');
 
 exports.login = (req, res) => {
   const { email, senha } = req.body;

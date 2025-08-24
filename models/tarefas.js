@@ -7,7 +7,7 @@ const tarefas = [
     responsavel: '',
     usuarioId: 2,
     respostaMensagem: '',
-    respostaAnexo: ''
+    anexos: [] // <== Novo campo para múltiplos arquivos
   },
   {
     id: 2,
@@ -17,7 +17,7 @@ const tarefas = [
     responsavel: 'advogado1',
     usuarioId: 1,
     respostaMensagem: '',
-    respostaAnexo: ''
+    anexos: [] // <== Também aqui
   }
 ];
 

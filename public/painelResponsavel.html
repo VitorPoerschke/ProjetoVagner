@@ -283,7 +283,7 @@
             ${t.observacao ? `<span class="bolinha" title="${t.observacao}"></span>` : ''}
           </td>
           <td>
-          ${t.anexo ? `<a href="/uploads/${t.anexo}" target="_blank">${t.anexo}</a>` : 'Nenhum'}
+          ${t.anexos && t.anexos.length ? t.anexos.map(arq => `<a href="/uploads/${arq}" target="_blank">${arq}</a>`).join('<br>') : 'Nenhum'}
           </td>
           <td>${t.nomeCriador || "Desconhecido"}</td>
           <td>

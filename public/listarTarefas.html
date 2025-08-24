@@ -331,9 +331,9 @@
 
         document.getElementById('modalDescricao').innerText = tarefa.descricao || 'Sem descrição';
         const anexoSpan = document.getElementById('modalAnexo');
-        if (tarefa.anexo) {
-          anexoSpan.innerHTML = `<a href="/uploads/${tarefa.anexo}" download="${tarefa.anexo}">${tarefa.anexo}</a>`;
-        } else {
+       if (tarefa.anexos && tarefa.anexos.length) {
+        anexoSpan.innerHTML = tarefa.anexos.map(arq => `<a href="/uploads/${arq}" download>${arq}</a>`).join('<br>');
+      } else {
           anexoSpan.innerText = 'Nenhum';
         }
 

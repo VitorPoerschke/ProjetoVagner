@@ -208,13 +208,24 @@
           const div = document.createElement("div");
           div.classList.add("tarefa");
 
+          let anexosHtml = "";
+          // Exibe múltiplos anexos se existirem
+          if (Array.isArray(tarefa.respostaAnexos) && tarefa.respostaAnexos.length > 0) {
+            anexosHtml = `<p><strong>Anexos da Resposta:</strong><br>`;
+            tarefa.respostaAnexos.forEach(nome =>
+              anexosHtml += `<a href="/uploads/${nome}" target="_blank">${nome}</a><br>`
+            );
+            anexosHtml += `</p>`;
+          } else if (tarefa.respostaAnexo) {
+            // Compatibilidade: exibe anexo único se existir no formato antigo
+            anexosHtml = `<p><strong>Anexo:</strong> <a href="/uploads/${tarefa.respostaAnexo}" target="_blank">Baixar</a></p>`;
+          }
+
           div.innerHTML = `
             <h3>${tarefa.titulo}</h3>
             <p><strong>Descrição:</strong> ${tarefa.descricao}</p>
             <p><strong>Resposta:</strong> ${tarefa.respostaMensagem}</p>
-            ${tarefa.respostaAnexo
-              ? `<p><strong>Anexo:</strong> <a href="/uploads/${tarefa.respostaAnexo}" target="_blank">Baixar</a></p>`
-              : ""}
+            ${anexosHtml}
             <div class="botoes">
               <button onclick="concluirTarefa(${tarefa.id})">Concluir</button>
               <button onclick="devolverTarefa(${tarefa.id})">Devolver</button>

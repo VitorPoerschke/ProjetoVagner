@@ -246,7 +246,8 @@ exports.responderTarefa = (req, res) => {
     const user = req.user;
     const id = parseInt(req.params.id);
     const mensagem = req.body.mensagem;
-    const anexo = req.file ? req.file.filename : null;
+    // >>>> ALTERADO: pega todos os anexos enviados
+    const anexos = req.files ? req.files.map(f => f.filename) : [];
 
     if (user.role !== 'responsavel') {
       return res.status(403).json({ erro: 'Apenas responsáveis podem enviar respostas' });
@@ -258,8 +259,8 @@ exports.responderTarefa = (req, res) => {
     }
 
     tarefa.respostaMensagem = mensagem || '';
-    tarefa.respostaAnexo = anexo || '';
-    tarefa.status = 'em andamento'; // opcional: mudar status para "em andamento" após resposta
+    tarefa.respostaAnexos = anexos; // >>>> ALTERADO: salva array de anexos
+    tarefa.status = 'em andamento';
 
     res.json({ mensagem: 'Resposta enviada com sucesso!' });
   } catch (err) {

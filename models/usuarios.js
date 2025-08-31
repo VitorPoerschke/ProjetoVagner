@@ -26,6 +26,5 @@ const usuarios = [
   },
 ];
 
-
 module.exports = { usuarios }; 
 // Exporta a lista de usuários para ser usada nas rotas

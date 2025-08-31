@@ -209,7 +209,7 @@
         <p><label>Mensagem:</label><br>
         <textarea id="mensagem" rows="4" style="width: 100%;"></textarea></p>
         <p><label>Anexo:</label><br>
-        <input type="file" id="anexo" /></p>
+        <input type="file" id="anexo" name="anexos" multiple accept="application/pdf">
         <button type="submit">Enviar Resposta</button>
         <button type="button" onclick="fecharModal()">Cancelar</button>
       </form>
@@ -217,51 +217,51 @@
   </div>
 
   <script>
-    const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
-    function logout() {
-      localStorage.removeItem("token");
-      window.location.href = "index.html";
+  // Função para abrir o modal de resposta (mantém igual)
+  function abrirModalResposta(id) {
+    document.getElementById("tarefaId").value = id;
+    document.getElementById("modalResposta").style.display = "flex";
+  }
+
+  function fecharModal() {
+    document.getElementById("modalResposta").style.display = "none";
+  }
+
+  // ATUALIZADO: Envio de resposta com múltiplos anexos (até 15 PDFs)
+  document.getElementById("formResposta").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const id = document.getElementById("tarefaId").value;
+    const mensagem = document.getElementById("mensagem").value;
+    const files = document.getElementById("anexo").files;
+
+    const formData = new FormData();
+    formData.append("mensagem", mensagem);
+    // Adiciona todos os arquivos selecionados
+    for (let i = 0; i < files.length; i++) {
+      formData.append("anexos", files[i]);
     }
 
-    function abrirModalResposta(id) {
-      document.getElementById("tarefaId").value = id;
-      document.getElementById("modalResposta").style.display = "flex";
+    try {
+      const res = await fetch(`/api/tarefas/${id}/responder`, {
+        method: "PUT",
+        headers: {
+          Authorization: "Bearer " + token
+        },
+        body: formData
+      });
+
+      if (!res.ok) throw new Error("Erro ao enviar resposta");
+
+      alert("Resposta enviada com sucesso!");
+      fecharModal();
+      carregarTarefas();
+    } catch (err) {
+      alert("Erro ao enviar resposta.");
+      console.error(err);
     }
-
-    function fecharModal() {
-      document.getElementById("modalResposta").style.display = "none";
-    }
-
-    document.getElementById("formResposta").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const id = document.getElementById("tarefaId").value;
-      const mensagem = document.getElementById("mensagem").value;
-      const anexo = document.getElementById("anexo").files[0];
-
-      const formData = new FormData();
-      formData.append("mensagem", mensagem);
-      if (anexo) formData.append("anexo", anexo);
-
-      try {
-        const res = await fetch(`/api/tarefas/${id}/responder`, {
-          method: "PUT",
-          headers: {
-            Authorization: "Bearer " + token
-          },
-          body: formData
-        });
-
-        if (!res.ok) throw new Error("Erro ao enviar resposta");
-
-        alert("Resposta enviada com sucesso!");
-        fecharModal();
-        carregarTarefas();
-      } catch (err) {
-        alert("Erro ao enviar resposta.");
-        console.error(err);
-      }
-    });
+  });
 
     async function carregarTarefas() {
       const res = await fetch("/api/tarefas", {

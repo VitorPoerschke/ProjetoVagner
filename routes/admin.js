@@ -11,3 +11,5 @@ router.get('/logs', autenticarToken, (req, res) => {
 });
 
 module.exports = router;
+
+//atualizado em 26/10/2023

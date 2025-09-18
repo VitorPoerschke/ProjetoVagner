@@ -1,6 +1,6 @@
 const { tarefas, historicoTarefas } = require('../models/tarefas');
 const { usuarios } = require('../models/usuarios');
-
+const { registrarLog } = require('../utils/auditoria');
 
 exports.listarTarefas = (req, res) => {
   try {
@@ -298,3 +298,53 @@ exports.verificarEspaco = (req, res) => {
   const uso = obterEspacoUsado();
   res.json({ uso, maximo: MAX_BYTES });
 };
+
+//NOVO SISTEMA DE LOGS DO SISTEMA
+
+registrarLog({
+  usuarioId: req.user.id,
+  usuarioNome: req.user.nome,
+  role: req.user.role,
+  acao: 'Criou nova tarefa',
+  detalhe: `Título: ${novaTarefa.titulo}`
+});
+
+registrarLog({
+  usuarioId: req.user.id,
+  usuarioNome: req.user.nome,
+  role: req.user.role,
+  acao: 'Upload de arquivo',
+  detalhe: `Tarefa #${tarefa.id}. Arquivos: ${req.files.map(f => f.originalname).join(', ')}`
+});
+
+registrarLog({
+  usuarioId: req.user.id,
+  usuarioNome: req.user.nome,
+  role: req.user.role,
+  acao: 'Download de arquivo',
+  detalhe: `Arquivo: ${nomeArquivo}`
+});
+
+registrarLog({
+  usuarioId: req.user.id,
+  usuarioNome: req.user.nome,
+  role: req.user.role,
+  acao: 'Conclusão de tarefa',
+  detalhe: `Tarefa #${tarefa.id} - ${tarefa.titulo}`
+});
+
+registrarLog({
+  usuarioId: req.user.id,
+  usuarioNome: req.user.nome,
+  role: req.user.role,
+  acao: 'Respondeu tarefa',
+  detalhe: `Tarefa #${tarefa.id}`
+});
+
+registrarLog({
+  usuarioId: req.user.id,
+  usuarioNome: req.user.nome,
+  role: req.user.role,
+  acao: 'Devolveu tarefa',
+  detalhe: `Tarefa #${tarefa.id}`
+});

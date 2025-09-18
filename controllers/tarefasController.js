@@ -361,3 +361,6 @@ exports.excluirTarefaHistorico = (req, res) => {
 
   res.json({ mensagem: 'Tarefa excluída do histórico com sucesso' });
 };
+
+
+//fim do arquivo//atualizado em 26/10/2023  

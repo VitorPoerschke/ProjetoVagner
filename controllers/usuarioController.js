@@ -61,3 +61,6 @@ exports.deletarUsuario = (req, res) => {
   usuarios.splice(index, 1);
   res.json({ mensagem: 'Usuário deletado com sucesso' });
 };
+
+
+//fim do arquivo//atualizado em 26/10/2023  
